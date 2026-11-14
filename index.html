@@ -105,10 +105,11 @@ main{max-width:760px;margin:0 auto;padding:16px}
 
 .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom)}
-.bottom-nav ul{list-style:none;margin:0 auto;padding:0;max-width:760px;display:grid;grid-template-columns:repeat(5,1fr);height:var(--nav-h)}
-.bottom-nav button{width:100%;height:100%;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  font-size:.72rem;color:var(--muted);cursor:pointer}
-.bottom-nav .ico{font-size:1.35rem;line-height:1}
+.brand-ico{width:1.15em;height:1.15em;vertical-align:-.2em}
+.bottom-nav ul{list-style:none;margin:0 auto;padding:0;max-width:760px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));height:var(--nav-h)}
+.bottom-nav button{width:100%;height:100%;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;
+  font-size:.6rem;color:var(--muted);cursor:pointer;overflow:hidden;white-space:nowrap}
+.bottom-nav .ico{font-size:1.2rem;line-height:1}
 .bottom-nav button[aria-current="page"]{color:var(--green-ink);font-weight:700}
 .bottom-nav button[aria-current="page"] .ico{transform:translateY(-1px)}
 .bottom-nav .nav-sos{color:var(--red-ink);font-weight:700}
@@ -395,7 +396,7 @@ dialog h3{font-family:var(--font-display);font-size:1.25rem;color:var(--heading)
 </header>
 <div id="storageWarning" class="banner warn" hidden role="alert">
   ⚠️ Este navegador não está permitindo salvar dados localmente. Suas edições valem apenas enquanto a página estiver aberta.
-  Use <b>Mais → Exportar backup</b> para não perder informações.
+  Use <b>Info → Backup dos dados → Exportar backup</b> para não perder informações.
 </div>
 
 <!-- ===================== CONTEÚDO (telas) ===================== -->
@@ -404,7 +405,6 @@ dialog h3{font-family:var(--font-display);font-size:1.25rem;color:var(--heading)
   <section class="view" id="view-roteiro" aria-label="Roteiro"></section>
   <section class="view" id="view-saude" aria-label="Saúde e emergência"></section>
   <section class="view" id="view-contatos" aria-label="Contatos"></section>
-  <section class="view" id="view-mais" aria-label="Mais"></section>
   <section class="view" id="view-hotel" aria-label="Hospedagem"></section>
   <section class="view" id="view-passeios" aria-label="Passeios"></section>
   <section class="view" id="view-checklist" aria-label="Checklist"></section>
@@ -419,9 +419,12 @@ dialog h3{font-family:var(--font-display);font-size:1.25rem;color:var(--heading)
   <ul>
     <li><button data-action="go" data-view="inicio"><span class="ico" aria-hidden="true">🏠</span>Início</button></li>
     <li><button data-action="go" data-view="roteiro"><span class="ico" aria-hidden="true">🗺️</span>Roteiro</button></li>
+    <li><button data-action="go" data-view="hotel"><span class="ico" aria-hidden="true">🏨</span>Hotel</button></li>
+    <li><button data-action="go" data-view="passeios"><span class="ico" aria-hidden="true">🌳</span>Passeios</button></li>
     <li><button data-action="go" data-view="saude" class="nav-sos"><span class="ico" aria-hidden="true">❤️‍🩹</span>Saúde</button></li>
     <li><button data-action="go" data-view="contatos"><span class="ico" aria-hidden="true">👨‍👩‍👧‍👦</span>Contatos</button></li>
-    <li><button data-action="go" data-view="mais"><span class="ico" aria-hidden="true">☰</span>Mais</button></li>
+    <li><button data-action="go" data-view="checklist"><span class="ico" aria-hidden="true">✅</span>Checklist</button></li>
+    <li><button data-action="go" data-view="info"><span class="ico" aria-hidden="true">ℹ️</span>Info</button></li>
   </ul>
 </nav>
 
@@ -459,7 +462,6 @@ const CONFIG = Object.freeze({
     origin: 'São Pedro da Aldeia – RJ',
     period: '16/11/2026 a 19/11/2026',
     group: '6 adultos e 2 crianças',
-    groupDetail: 'Dois casais, cada um com um filho, e dois avós',
     departureISO: '2026-11-16T06:00:00-03:00',
     endISO: '2026-11-19T23:59:59-03:00',
     days: ['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19']
@@ -601,6 +603,12 @@ const callBtn = (phone, label = 'Ligar', cls = 'primary sm') => linkBtn({ href: 
 const waBtn = (phone, cls = 'sm') => linkBtn({ href: waHref(phone), label: 'WhatsApp', cls, net: true, newTab: true, ico: '💬' });
 const mapBtn = (query, label = 'Abrir no mapa', cls = 'blue sm') => linkBtn({ href: mapsHref(query), label, cls, net: true, newTab: true, ico: '📍' });
 const navBtn = (query, label = 'Navegar', cls = 'sm') => linkBtn({ href: dirHref(query), label, cls, net: true, newTab: true, ico: '🧭' });
+/* Waze e Google Maps: em links https o celular abre o app instalado */
+const wazeHref = (q) => 'https://waze.com/ul?navigate=yes&q=' + encodeURIComponent(q);
+const ICO_WAZE = '<svg class="brand-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="#33CCFF" d="M12 2.5c-4.7 0-8.5 3.4-8.5 7.7 0 1.6.5 3 1.3 4.2-.3 1.2-1 2.2-1.8 2.8 1.6.2 3-.3 4-1.1 1.1.5 2.3.8 3.6.8 4.7 0 8.5-3.4 8.5-7.7S16.7 2.5 12 2.5z"/><circle cx="8.8" cy="9.8" r="1.1" fill="#1b1b1b"/><circle cx="14.6" cy="9.8" r="1.1" fill="#1b1b1b"/><path d="M8.6 12.6c1.8 1.8 4.4 1.8 6.2 0" stroke="#1b1b1b" stroke-width="1.2" fill="none" stroke-linecap="round"/><circle cx="8.3" cy="19" r="1.7" fill="#1b1b1b"/><circle cx="14.7" cy="19" r="1.7" fill="#1b1b1b"/></svg>';
+const ICO_GMAPS = '<svg class="brand-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="#EA4335" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7z"/><path fill="#4285F4" d="M5 9a7 7 0 0 1 2.1-5L12 9z"/><path fill="#FBBC04" d="M12 9 7.1 4A7 7 0 0 1 12 2z" opacity=".0"/><circle cx="12" cy="9" r="2.8" fill="#fff"/></svg>';
+const wazeBtn = (query) => linkBtn({ href: wazeHref(query), label: 'Waze', cls: 'sm', net: true, newTab: true, ico: ICO_WAZE });
+const gmapsBtn = (query) => linkBtn({ href: dirHref(query), label: 'Google Maps', cls: 'sm', net: true, newTab: true, ico: ICO_GMAPS });
 const badge = (status) => status === 'confirmar' ? '<span class="badge conf">A CONFIRMAR</span>'
   : status === 'ok' ? '<span class="badge ok">CONFIRMADO</span>' : '<span class="badge inf">INFORMADO</span>';
 
@@ -669,7 +677,7 @@ function defaultState() {
       ] }
     ],
     medical: {
-      childName: '', childAge: '8', respName: '', respPhone: '', meds: '', dosage: '', allergies: '',
+      childName: '', childAge: '8', respName: '', respPhone: '', meds: '', allergies: '',
       neuroName: '', neuroPhone: '', emergencyPlan: '', rescueMed: '', insurance: '', insuranceCard: ''
     },
     hospitals: { hospVirginia: { confirmed: false, note: '' }, hospSL: { confirmed: false, note: '' } },
@@ -776,8 +784,15 @@ const Sync = {
   },
   /** Define o estado atual como referência (sem marcar nada como pendente) */
   rebase(force) {
-    for (const k of this.keys) if (force || this.base[k] === undefined) { this.base[k] = JSON.stringify(S[k]); if (force) delete this.dirty[k]; }
+    // Seção nunca sincronizada neste aparelho: a referência é o modelo padrão, então
+    // o que já foi preenchido aqui (antes da sincronização existir) é enviado ao grupo.
+    const def = defaultState();
+    for (const k of this.keys) {
+      if (force) { this.base[k] = JSON.stringify(S[k]); delete this.dirty[k]; }
+      else if (this.base[k] === undefined) this.base[k] = JSON.stringify(def[k]);
+    }
     this.persist();
+    if (!force) this.touch();
   },
   persist() {
     try {
@@ -814,6 +829,8 @@ const Sync = {
         if (JSON.stringify(r.valor) !== JSON.stringify(S[k])) { S[k] = mergeDefaults(def[k], r.valor); changed = true; }
         this.base[k] = JSON.stringify(S[k]);
       }
+      // Garante as 3 famílias mesmo se o grupo ainda tiver a versão com 2
+      if (S.families.length < 3) { S.families.push(defaultState().families[2]); this.dirty.families = true; changed = true; }
       // 2) Envia as alterações locais pendentes
       const d = this.keys.filter(k => this.dirty[k]);
       if (d.length) {
@@ -904,8 +921,8 @@ window.addEventListener('afterprint', () => Theme.apply());
 /* =====================================================================
    6. ROTEAMENTO ENTRE TELAS
    ===================================================================== */
-const VIEWS = ['inicio', 'roteiro', 'saude', 'contatos', 'mais', 'hotel', 'passeios', 'checklist', 'info'];
-const NAV_PARENT = { hotel: 'mais', passeios: 'mais', checklist: 'mais', info: 'mais' };
+const VIEWS = ['inicio', 'roteiro', 'saude', 'contatos', 'hotel', 'passeios', 'checklist', 'info'];
+const NAV_PARENT = {};
 
 function go(view, { push = true } = {}) {
   if (!VIEWS.includes(view)) view = 'inicio';
@@ -943,7 +960,7 @@ function renderHome() {
       <h1>${esc(T.name)} · Vale da Mantiqueira</h1>
       <p>🏨 ${esc(T.destination)}</p>
       <p>📍 ${esc(T.city)} &nbsp;·&nbsp; 📅 ${esc(T.period)}</p>
-      <p class="small">👨‍👩‍👧‍👦 ${esc(T.group)} — ${esc(T.groupDetail)}</p>
+      <p class="small">👨‍👩‍👧‍👦 ${esc(T.group)}</p>
       <div class="countdown" id="countdown" aria-live="polite"></div>
     </div>
 
@@ -992,7 +1009,7 @@ function renderPendencies() {
   const ul = $('#pendList');
   if (!ul) return;
   const M = S.medical;
-  const medKeys = ['childName', 'respPhone', 'meds', 'dosage', 'neuroPhone', 'emergencyPlan'];
+  const medKeys = ['childName', 'respPhone', 'meds', 'neuroPhone', 'emergencyPlan'];
   const medMissing = medKeys.filter(k => isBlank(M[k])).length;
   const hospPending = CONFIG.hospitals.filter(h => !S.hospitals[h.id]?.confirmed).length;
   const contactsFilled = S.contacts.filter(c => !isBlank(c.name) && !isBlank(c.phone)).length;
@@ -1034,7 +1051,7 @@ function renderRoute() {
         ${s.kind === 'parada' && isBlank(s.time) ? '<div class="small muted">Horário da parada: definir conforme o GPS no dia.</div>' : ''}
         ${s.notes ? `<div class="note">📝 ${esc(s.notes)}</div>` : ''}
         <div class="btn-row">
-          ${P ? mapBtn(P.query) + navBtn(P.query) : ''}
+          ${P ? wazeBtn(P.query) + gmapsBtn(P.query) : ''}
           <button class="btn sm" data-action="edit-step" data-id="${s.id}">✏️ Editar</button>
         </div>
       </div></li>`;
@@ -1078,7 +1095,7 @@ function renderHotel() {
   const H = CONFIG.places.hotel;
   $('#view-hotel').innerHTML = `
     <div class="view-head"><div><h2>Hospedagem</h2><p class="muted small">${esc(H.name)}</p></div>
-      <button class="btn sm ghost" data-action="go" data-view="mais">‹ Voltar</button></div>
+      <button class="btn sm ghost" data-action="go" data-view="inicio">‹ Início</button></div>
     <div class="card tint-green">
       <div class="card-title"><span>🏨</span><h3>${esc(H.name)}</h3></div>
       <dl class="kv">
@@ -1144,7 +1161,7 @@ function renderPasseios() {
 
   $('#view-passeios').innerHTML = `
     <div class="view-head"><div><h2>Passeios</h2><p class="muted small">Sugestões próximas. Nada aqui garante funcionamento — confirme antes.</p></div>
-      <button class="btn sm ghost" data-action="go" data-view="mais">‹ Voltar</button></div>
+      <button class="btn sm ghost" data-action="go" data-view="inicio">‹ Início</button></div>
     <h3 style="margin:6px 0 10px">Programação sugerida</h3>
     ${days}
     <h3 style="margin:18px 0 10px">Atrações</h3>
@@ -1177,7 +1194,6 @@ const MED_FIELDS = [
   { key: 'respName', label: 'Nome do responsável', rules: 'text' },
   { key: 'respPhone', label: 'Telefone do responsável', rules: 'phone', type: 'tel', placeholder: '(21) 99999-9999' },
   { key: 'meds', label: 'Medicamentos utilizados', type: 'textarea', rules: 'longtext', hint: 'Copie exatamente da receita.' },
-  { key: 'dosage', label: 'Dosagem e horários', type: 'textarea', rules: 'longtext', hint: 'Conforme prescrição médica.' },
   { key: 'allergies', label: 'Alergias', type: 'textarea', rules: 'longtext', placeholder: 'Ex.: nenhuma conhecida' },
   { key: 'neuroName', label: 'Nome do neurologista', rules: 'text' },
   { key: 'neuroPhone', label: 'Telefone do neurologista', rules: 'phone', type: 'tel' },
@@ -1210,7 +1226,6 @@ function emergencyCardHtml() {
         <dt>Criança</dt><dd>${medVal('childName')}${M.childAge ? ` · ${esc(M.childAge)} anos` : ''}</dd>
         <dt>Condição</dt><dd>Histórico de convulsões · uso contínuo de anticonvulsionante</dd>
         <dt>Medicamentos</dt><dd>${medVal('meds')}</dd>
-        <dt>Dose/horários</dt><dd>${medVal('dosage')}</dd>
         <dt>Alergias</dt><dd>${medVal('allergies')}</dd>
         <dt>Resgate</dt><dd>${medVal('rescueMed')}</dd>
         <dt>Plano médico</dt><dd>${medVal('emergencyPlan')}</dd>
@@ -1282,7 +1297,7 @@ function renderSaude() {
     <div class="card">
       <details class="collapsible" ${S.medical.childName ? '' : 'open'}>
         <summary><h3 style="margin:0">📝 Ficha médica (editável)</h3></summary>
-        <p class="small muted" style="margin-top:8px">Preencha somente com informações da receita e do médico. Os dados ficam salvos apenas neste aparelho.</p>
+        <p class="small muted" style="margin-top:8px">Preencha somente com informações da receita e do médico. Salva automaticamente ao digitar e é compartilhado com todos do grupo.</p>
         <div class="grid-2">${MED_FIELDS.map(f => field({ ...f, bind: 'medical.' + f.key })).join('')}</div>
       </details>
     </div>
@@ -1398,7 +1413,6 @@ Hospedagem: Hotel Fazenda Vale da Mantiqueira – Virgínia/MG – (35) 3373-190
 Criança: ${v('childName')}${M.childAge ? ', ' + M.childAge + ' anos' : ''}
 Condição: histórico de convulsões; uso contínuo de anticonvulsionante
 Medicamentos: ${v('meds')}
-Dose/horários: ${v('dosage')}
 Alergias: ${v('allergies')}
 Resgate: ${v('rescueMed')}
 Plano de emergência: ${v('emergencyPlan')}
@@ -1495,7 +1509,7 @@ function renderChecklistView() {
   const pct = all.length ? Math.round(all.filter(i => i.done).length / all.length * 100) : 0;
   $('#view-checklist').innerHTML = `
     <div class="view-head"><div><h2>Checklist da viagem</h2><p class="muted small">Marcações ficam salvas neste aparelho.</p></div>
-      <button class="btn sm ghost" data-action="go" data-view="mais">‹ Voltar</button></div>
+      <button class="btn sm ghost" data-action="go" data-view="inicio">‹ Início</button></div>
     <div class="card tint-green"><div class="progress-label"><b>Progresso geral</b><b>${pct}%</b></div>
       <div class="progress"><span style="width:${pct}%"></span></div></div>
     ${S.checklists.map(c => `<div class="card" data-checklist="${c.id}"></div>`).join('')}
@@ -1553,7 +1567,7 @@ function renderInfo() {
   const total = S.info.expenses.reduce((s, e) => s + parseMoney(e.value), 0) + parseMoney(S.info.fuel) + parseMoney(S.info.tolls);
   $('#view-info').innerHTML = `
     <div class="view-head"><div><h2>Informações úteis</h2></div>
-      <button class="btn sm ghost" data-action="go" data-view="mais">‹ Voltar</button></div>
+      <button class="btn sm ghost" data-action="go" data-view="inicio">‹ Início</button></div>
 
     <div class="card tint-blue">
       <div class="card-title" style="justify-content:space-between"><h3>🌦️ Previsão do tempo</h3><span class="net-tag">🌐 internet</span></div>
@@ -1596,7 +1610,9 @@ function renderInfo() {
 
     <div class="card">
       ${field({ bind: 'info.notes', label: '🗒️ Observações gerais', type: 'textarea', rules: 'longtext' })}
-    </div>`;
+    </div>
+    <div id="maisSlot"></div>`;
+  renderMais();
 }
 
 function updateCostTotal() {
@@ -1608,17 +1624,8 @@ function updateCostTotal() {
    15. MAIS (menu, backup, impressão, compartilhamento)
    ===================================================================== */
 function renderMais() {
-  const tile = (view, ico, t, s) => `<button class="q" data-action="go" data-view="${view}"><span class="ico">${ico}</span>${t}<small>${s}</small></button>`;
-  $('#view-mais').innerHTML = `
-    <div class="view-head"><div><h2>Mais</h2></div></div>
-    <div class="quick more-grid">
-      ${tile('hotel', '🏨', 'Hospedagem', 'Reserva e contatos')}
-      ${tile('passeios', '🌳', 'Passeios', 'Atrações e programação')}
-      ${tile('checklist', '✅', 'Checklist', 'Bagagem e documentos')}
-      ${tile('info', 'ℹ️', 'Informações', 'Clima, custos, endereços')}
-      ${tile('saude', '❤️‍🩹', 'Saúde', 'Ficha e hospitais')}
-      ${tile('roteiro', '🗺️', 'Roteiro', 'Ida e volta')}
-    </div>
+  const slot = $('#maisSlot'); if (!slot) return;
+  slot.innerHTML = `
     <div class="card">
       <div class="card-title"><span>🎨</span><h3>Aparência</h3></div>
       <div class="seg" role="group" aria-label="Tema">
@@ -1733,7 +1740,7 @@ function buildPrintCard() {
         <div class="pc-box"><h2>Criança</h2>
           <p><b>${v('childName')}</b>${M.childAge ? ' · ' + esc(M.childAge) + ' anos' : ''}</p>
           <p>Histórico de convulsões · uso contínuo de anticonvulsionante</p>
-          <p><b>Medicamentos:</b> ${v('meds')}</p><p><b>Dose/horários:</b> ${v('dosage')}</p>
+          <p><b>Medicamentos:</b> ${v('meds')}</p>
           <p><b>Alergias:</b> ${v('allergies')}</p><p><b>Resgate:</b> ${v('rescueMed')}</p>
           <p><b>Convênio:</b> ${v('insurance')} · <b>Nº:</b> ${v('insuranceCard')}</p></div>
         <div class="pc-box"><h2>Contatos</h2>
