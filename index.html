@@ -366,7 +366,8 @@ dialog h3{font-family:var(--font-display);font-size:1.25rem;color:var(--heading)
 }
 /* Layout do cartão impresso */
 .print-card{font-size:10pt;color:#000}
-.pc-frame{border:3px solid #c0262d;border-radius:10px;padding:10px 12px}
+.pc-frame{border:3px solid #c0262d;border-radius:10px;padding:10px 12px;break-after:page;margin-bottom:12px}
+.pc-frame:last-child{break-after:auto}
 .pc-title{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #c0262d;padding-bottom:6px;margin-bottom:8px}
 .pc-title h1{font-size:15pt;color:#c0262d;margin:0}
 .pc-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -690,10 +691,7 @@ function defaultState() {
         { id: uid(), time: 'Noite', text: 'Arrumar as malas para o retorno', done: false }
       ] }
     ],
-    medical: {
-      childName: '', childAge: '8', respName: '', respPhone: '', meds: '', allergies: '',
-      neuroName: '', neuroPhone: '', emergencyPlan: '', rescueMed: '', insurance: '', insuranceCard: ''
-    },
+    fichas: {}, // ficha de saúde por pessoa: { [idDoContato]: { campos de MED_FIELDS } }
     hospitals: { hospVirginia: { confirmed: false, note: '' }, hospSL: { confirmed: false, note: '' } },
     contacts: Array.from({ length: 8 }, () => ({ id: uid(), name: '', phone: '', relation: '', obs: '' })),
     families: [
@@ -750,7 +748,7 @@ const Store = {
 };
 
 let S = Store.load();
-delete S.medical.dosage; // campo removido
+delete S.medical; // ficha única antiga (substituída por S.fichas, uma por pessoa)
 if (!FAMS.includes(S.myFam)) S.myFam = 'f1';
 /** Atalhos para os dados da família selecionada neste aparelho */
 const CL = () => S['chk_' + S.myFam].lists;
@@ -780,7 +778,7 @@ const commitDebounced = debounce(() => commit(), 400);
    conexão voltar. Conflito: vale a última gravação de cada seção.
    ===================================================================== */
 const Sync = {
-  keys: ['route', 'reservas', 'chk_f1', 'chk_f2', 'chk_f3', 'plan', 'hospitals', 'contacts', 'families', 'info', 'medical'],
+  keys: ['route', 'reservas', 'chk_f1', 'chk_f2', 'chk_f3', 'plan', 'hospitals', 'contacts', 'families', 'info', 'fichas'],
   baseKey: 'guiaMantiqueira.syncBase', dirtyKey: 'guiaMantiqueira.syncDirty',
   base: {}, dirty: {}, busy: false, pendingRender: false, lastOk: null,
   enabled() { return !!(CONFIG.sync.url && CONFIG.sync.key) && Store.available; },
@@ -790,8 +788,6 @@ const Sync = {
       this.base = JSON.parse(localStorage.getItem(this.baseKey) || '{}');
       this.dirty = JSON.parse(localStorage.getItem(this.dirtyKey) || '{}');
     } catch { this.base = {}; this.dirty = {}; }
-    // Campo removido não pode contar como "alteração local" (evitaria sobrescrever dados mais novos do grupo)
-    try { if (this.base.medical) { const m = JSON.parse(this.base.medical); delete m.dosage; this.base.medical = JSON.stringify(m); } } catch { delete this.base.medical; }
     this.rebase(false);
     window.addEventListener('online', () => this.run());
     document.addEventListener('visibilitychange', () => { if (!document.hidden) this.run(); });
@@ -839,7 +835,6 @@ const Sync = {
         const k = r.chave;
         if (!this.keys.includes(k) || this.dirty[k] || r.valor == null || Array.isArray(r.valor) !== Array.isArray(def[k])) continue;
         const novo = mergeDefaults(def[k], r.valor);
-        if (k === 'medical') delete novo.dosage; // campo removido
         if (JSON.stringify(novo) !== JSON.stringify(S[k])) { S[k] = novo; changed = true; }
         this.base[k] = JSON.stringify(S[k]);
       }
@@ -1027,9 +1022,8 @@ function updateCountdown() {
 function renderPendencies() {
   const ul = $('#pendList');
   if (!ul) return;
-  const M = S.medical;
-  const medKeys = ['childName', 'respPhone', 'meds', 'neuroPhone', 'emergencyPlan'];
-  const medMissing = medKeys.filter(k => isBlank(M[k])).length;
+  const nomeados = S.contacts.filter(c => !isBlank(c.name));
+  const medMissing = nomeados.filter(c => !temFicha(c.id)).length;
   const hospPending = CONFIG.hospitals.filter(h => !S.hospitals[h.id]?.confirmed).length;
   const contactsFilled = S.contacts.filter(c => !isBlank(c.name) && !isBlank(c.phone)).length;
   const famFilled = S.families.reduce((n, f) => n + f.contacts.length, 0);
@@ -1037,7 +1031,7 @@ function renderPendencies() {
   const pct = all.length ? Math.round(all.filter(i => i.done).length / all.length * 100) : 0;
   const rows = [
     [hospPending === 0, hospPending ? `Confirmar ${hospPending} hospital(is): pediatria e emergência neurológica` : 'Hospitais confirmados', 'saude'],
-    [medMissing === 0, medMissing ? `Ficha médica: ${medMissing} campo(s) essencial(is) vazio(s)` : 'Ficha médica preenchida', 'saude'],
+    [medMissing === 0, medMissing ? `Fichas de saúde: ${medMissing} pessoa(s) sem ficha` : 'Fichas de saúde preenchidas', 'saude'],
     [contactsFilled >= 8, `Contatos dos viajantes: ${contactsFilled} de 8 preenchidos`, 'contatos'],
     [famFilled > 0, famFilled ? `${famFilled} contato(s) de emergência das famílias` : 'Cadastrar contatos de emergência das famílias', 'contatos'],
     [!isBlank(S.reservas[S.myFam].reserva), isBlank(S.reservas[S.myFam].reserva) ? 'Informar número da reserva do hotel' : 'Reserva do hotel registrada', 'hotel'],
@@ -1213,15 +1207,15 @@ function editPlan(dayId, itemId) {
    11. SAÚDE E EMERGÊNCIA
    ===================================================================== */
 const MED_FIELDS = [
-  { key: 'childName', label: 'Nome da criança', rules: 'text' },
-  { key: 'childAge', label: 'Idade (anos)', rules: 'age', inputmode: 'numeric' },
+  { key: 'age', label: 'Idade (anos)', rules: 'age', inputmode: 'numeric' },
+  { key: 'condicao', label: 'Condição de saúde', type: 'textarea', rules: 'longtext', placeholder: 'Ex.: diabetes, hipertensão, asma... (deixe vazio se não houver)' },
   { key: 'respName', label: 'Nome do responsável', rules: 'text' },
   { key: 'respPhone', label: 'Telefone do responsável', rules: 'phone', type: 'tel', placeholder: '(21) 99999-9999' },
-  { key: 'meds', label: 'Medicamentos utilizados', type: 'textarea', rules: 'longtext', hint: 'Copie exatamente da receita.' },
+  { key: 'meds', label: 'Medicamentos utilizados (com dose e horários)', type: 'textarea', rules: 'longtext', hint: 'Copie exatamente da receita.' },
   { key: 'allergies', label: 'Alergias', type: 'textarea', rules: 'longtext', placeholder: 'Ex.: nenhuma conhecida' },
-  { key: 'neuroName', label: 'Nome do neurologista', rules: 'text' },
-  { key: 'neuroPhone', label: 'Telefone do neurologista', rules: 'phone', type: 'tel' },
-  { key: 'emergencyPlan', label: 'Plano de emergência prescrito', type: 'textarea', rules: 'longtext', hint: 'Transcreva o plano individual fornecido pelo neurologista.' },
+  { key: 'doctorName', label: 'Nome do médico', rules: 'text' },
+  { key: 'doctorPhone', label: 'Telefone do médico', rules: 'phone', type: 'tel' },
+  { key: 'emergencyPlan', label: 'Plano de emergência prescrito', type: 'textarea', rules: 'longtext', hint: 'Transcreva o plano individual fornecido pelo médico.' },
   { key: 'rescueMed', label: 'Medicamento de resgate, se houver', type: 'textarea', rules: 'longtext', hint: 'Nome, dose e forma de uso SOMENTE conforme prescrição.' },
   { key: 'insurance', label: 'Convênio médico', rules: 'text' },
   { key: 'insuranceCard', label: 'Número da carteirinha', rules: 'text' }
@@ -1230,40 +1224,46 @@ const PROTOCOL = [
   'Marcar o horário de início da crise.',
   'Afastar objetos que possam causar ferimentos.',
   'Proteger a cabeça.',
-  'Colocar a criança de lado, quando possível e seguro.',
+  'Colocar a pessoa de lado, quando possível e seguro.',
   'Não restringir os movimentos.',
   'Não colocar objetos, dedos, água ou medicamentos na boca.',
   'Acionar emergência (SAMU 192) se a crise durar 5 minutos ou mais, houver crises repetidas sem recuperação, dificuldade respiratória ou outro sinal de gravidade.'
 ];
 const protocolHtml = () => `<ol class="protocol">${PROTOCOL.map((p, i) => `<li class="${i === 6 ? 'crit' : ''}">${esc(p)}</li>`).join('')}</ol>`;
-const neuroWarning = () => `<div class="alert red"><span class="ico">🩺</span><span>Siga sempre o plano individual de emergência fornecido pelo neurologista. Estas instruções são apenas cuidados gerais e não substituem a orientação médica.</span></div>`;
+const neuroWarning = () => `<div class="alert red"><span class="ico">🩺</span><span>Siga sempre o plano individual de emergência fornecido pelo médico. Estas instruções são apenas cuidados gerais e não substituem a orientação médica.</span></div>`;
 
-const medVal = (k) => isBlank(S.medical[k]) ? '<span class="missing">não preenchido</span>' : nl2br(S.medical[k]);
+/** Ficha de saúde de uma pessoa (contato de viajante) — vazia se nunca preenchida */
+const ficha = (id) => S.fichas[id] || {};
+const temFicha = (id) => Object.values(ficha(id)).some(v => !isBlank(v));
+const nomePessoa = (c, i) => isBlank(c.name) ? 'Viajante ' + (i + 1) : c.name;
+const medVal = (id, k) => isBlank(ficha(id)[k]) ? '<span class="missing">não preenchido</span>' : nl2br(ficha(id)[k]);
 
-/** Cartão de emergência resumido — usado na tela Saúde e no modo SOS (funciona offline) */
-function emergencyCardHtml() {
-  const M = S.medical;
+/** Cartão de emergência de uma pessoa — usado na tela Saúde e no modo SOS (funciona offline) */
+function emergencyCardHtml(c, i) {
+  const M = ficha(c.id);
   return `<div class="em-card">
     <header><h3>🆘 CARTÃO DE EMERGÊNCIA</h3><span class="small">funciona offline</span></header>
     <div class="em-body">
       <dl class="kv">
-        <dt>Criança</dt><dd>${medVal('childName')}${M.childAge ? ` · ${esc(M.childAge)} anos` : ''}</dd>
-        <dt>Condição</dt><dd>Histórico de convulsões · uso contínuo de anticonvulsionante</dd>
-        <dt>Medicamentos</dt><dd>${medVal('meds')}</dd>
-        <dt>Alergias</dt><dd>${medVal('allergies')}</dd>
-        <dt>Resgate</dt><dd>${medVal('rescueMed')}</dd>
-        <dt>Plano médico</dt><dd>${medVal('emergencyPlan')}</dd>
-        <dt>Responsável</dt><dd>${medVal('respName')}${M.respPhone ? `<br>${esc(M.respPhone)}` : ''}</dd>
-        <dt>Neurologista</dt><dd>${medVal('neuroName')}${M.neuroPhone ? `<br>${esc(M.neuroPhone)}` : ''}</dd>
-        <dt>Convênio</dt><dd>${medVal('insurance')}${M.insuranceCard ? ` · nº ${esc(M.insuranceCard)}` : ''}</dd>
+        <dt>Pessoa</dt><dd><b>${esc(nomePessoa(c, i))}</b>${M.age ? ` · ${esc(M.age)} anos` : ''}</dd>
+        <dt>Condição</dt><dd>${medVal(c.id, 'condicao')}</dd>
+        <dt>Medicamentos</dt><dd>${medVal(c.id, 'meds')}</dd>
+        <dt>Alergias</dt><dd>${medVal(c.id, 'allergies')}</dd>
+        <dt>Resgate</dt><dd>${medVal(c.id, 'rescueMed')}</dd>
+        <dt>Plano médico</dt><dd>${medVal(c.id, 'emergencyPlan')}</dd>
+        <dt>Responsável</dt><dd>${medVal(c.id, 'respName')}${M.respPhone ? `<br>${esc(M.respPhone)}` : ''}</dd>
+        <dt>Médico</dt><dd>${medVal(c.id, 'doctorName')}${M.doctorPhone ? `<br>${esc(M.doctorPhone)}` : ''}</dd>
+        <dt>Convênio</dt><dd>${medVal(c.id, 'insurance')}${M.insuranceCard ? ` · nº ${esc(M.insuranceCard)}` : ''}</dd>
       </dl>
       <div class="btn-row">
         ${callBtn('192', 'SAMU 192', 'red sm')}
         ${M.respPhone ? callBtn(M.respPhone, 'Responsável', 'sm') : ''}
-        ${M.neuroPhone ? callBtn(M.neuroPhone, 'Neurologista', 'sm') : ''}
+        ${M.doctorPhone ? callBtn(M.doctorPhone, 'Médico', 'sm') : ''}
       </div>
     </div></div>`;
 }
+const fichaOpen = {}; // quais fichas estão abertas (mantém ao redesenhar)
+const fichaBadge = (id) => temFicha(id) ? '<span class="badge ok">COM FICHA</span>' : '<span class="badge conf">SEM FICHA</span>';
 
 function hospitalCardHtml(h, compact = false) {
   const st = S.hospitals[h.id] || {};
@@ -1299,11 +1299,21 @@ function renderSaude() {
   $('#view-saude').innerHTML = `
     <div class="view-head"><div><h2>Saúde e emergência</h2><p class="muted small">Seção prioritária — disponível sem internet.</p></div></div>
     ${neuroWarning()}
-    <div id="emCardSlot">${emergencyCardHtml()}</div>
-    <div class="btn-row no-print" style="margin:-4px 0 16px">
-      <button class="btn sm" data-action="print-card">🖨️ Imprimir cartão (porta-luvas)</button>
-      <button class="btn sm" data-action="share-emergency">📤 Compartilhar</button>
-    </div>
+    <h3>🧑‍🤝‍🧑 Fichas de saúde por pessoa</h3>
+    <p class="small muted">Toque no nome para abrir o cartão de emergência e editar a ficha. Salva automaticamente e é compartilhado com o grupo. Preencha somente com informações de receita e do médico.</p>
+    ${S.contacts.map((c, i) => `<div class="card" style="padding:0 14px">
+      <details class="collapsible" data-ficha="${c.id}" ${fichaOpen[c.id] ? 'open' : ''} style="padding:12px 0">
+        <summary><b>${esc(nomePessoa(c, i))}</b><span style="margin-left:auto">${fichaBadge(c.id)}</span></summary>
+        <div style="margin-top:12px">
+          <div data-emcard="${c.id}">${emergencyCardHtml(c, i)}</div>
+          <div class="btn-row no-print" style="margin:8px 0 12px">
+            <button class="btn sm" data-action="print-card" data-id="${c.id}">🖨️ Imprimir cartão</button>
+            <button class="btn sm" data-action="share-emergency" data-id="${c.id}">📤 Compartilhar</button>
+          </div>
+          <h3 style="font-size:.95rem">📝 Editar ficha</h3>
+          <div class="grid-2">${MED_FIELDS.map(f => field({ ...f, bind: `fichas.${c.id}.${f.key}` })).join('')}</div>
+        </div>
+      </details></div>`).join('')}
 
     <h3>🏥 Hospitais</h3>
     <div class="alert amber small"><span class="ico">⚠️</span><span>Dados marcados como <b>INFORMADO</b> foram repassados e não foram verificados por este guia. Itens <b>A CONFIRMAR</b> devem ser checados diretamente com os hospitais antes da viagem.</span></div>
@@ -1317,14 +1327,6 @@ function renderSaude() {
       ${protocolHtml()}
     </div>
     ${neuroWarning()}
-
-    <div class="card">
-      <details class="collapsible" ${S.medical.childName ? '' : 'open'}>
-        <summary><h3 style="margin:0">📝 Ficha médica (editável)</h3></summary>
-        <p class="small muted" style="margin-top:8px">Preencha somente com informações da receita e do médico. Salva automaticamente ao digitar e é compartilhado com todos do grupo.</p>
-        <div class="grid-2">${MED_FIELDS.map(f => field({ ...f, bind: 'medical.' + f.key })).join('')}</div>
-      </details>
-    </div>
 
     <div class="card">
       <div class="card-title" style="justify-content:space-between"><h3>🗒️ Registro de crises</h3>
@@ -1373,7 +1375,7 @@ function updateSeizureUI() {
     $('[data-seizure="since"]', box).textContent = run ? 'Início: ' + new Date(S.seizure.start).toLocaleTimeString('pt-BR') : 'Cronômetro de crise';
     $('[data-seizure="msg"]', box).innerHTML = alarm
       ? '<b>5 MINUTOS OU MAIS — LIGUE PARA O SAMU 192</b>'
-      : run ? 'Mantenha a criança de lado e protegida. Aos 5 min, acione o SAMU.' : 'Toque em iniciar quando a crise começar.';
+      : run ? 'Mantenha a pessoa de lado e protegida. Aos 5 min, acione o SAMU.' : 'Toque em iniciar quando a crise começar.';
     $('[data-seizure="startBtn"]', box).disabled = run;
     $('[data-seizure="stopBtn"]', box).disabled = !run;
     let callLink = $('[data-seizure="call"]', box);
@@ -1385,7 +1387,6 @@ function updateSeizureUI() {
 
 /* ---------- Modo "Estou em uma emergência" ---------- */
 function openSOS() {
-  const M = S.medical;
   const [h1, h2] = CONFIG.hospitals;
   const big = (href, ico, title, sub, cls = '') => `<a class="call-big ${cls}" ${href ? `href="${esc(href)}"` : 'aria-disabled="true"'}>
     <span class="ico">${ico}</span><span><b>${esc(title)}</b><small>${esc(sub)}</small></span></a>`;
@@ -1401,18 +1402,13 @@ function openSOS() {
       <p class="small"><span class="badge conf">A CONFIRMAR</span> capacidade pediátrica e estrutura neurológica.</p>
       ${big(telHref(h2.phone), '🏥', h2.name, `${h2.role} · ${h2.phone}`, 'alt2')}
       <div class="btn-row" style="margin:-4px 0 10px">${mapBtn(h2.query, 'Mapa')}${navBtn(h2.query)}</div>
-      <div class="sos-section">Contatos da criança</div>
-      ${big(M.respPhone ? telHref(M.respPhone) : null, '👤', 'Responsável' + (M.respName ? ': ' + M.respName : ''), M.respPhone || 'Telefone não preenchido na ficha médica', 'alt')}
-      ${big(M.neuroPhone ? telHref(M.neuroPhone) : null, '🩺', 'Neurologista' + (M.neuroName ? ': ' + M.neuroName : ''), M.neuroPhone || 'Telefone não preenchido na ficha médica', 'alt2')}
-      <div class="sos-section">Plano individual do neurologista</div>
-      ${isBlank(M.emergencyPlan)
-        ? '<div class="alert amber"><span class="ico">⚠️</span><span>Plano individual não preenchido. Preencha na Ficha médica (Saúde).</span></div>'
-        : `<div class="card danger"><div>${nl2br(M.emergencyPlan)}</div>${!isBlank(M.rescueMed) ? `<div class="note"><b>Resgate:</b> ${nl2br(M.rescueMed)}</div>` : ''}</div>`}
       <div class="sos-section">Primeiros cuidados</div>
       <div class="card">${protocolHtml()}</div>
       ${neuroWarning()}
-      <div class="sos-section">Ficha da criança</div>
-      ${emergencyCardHtml()}
+      <div class="sos-section">Fichas de saúde</div>
+      ${S.contacts.map((c, i) => temFicha(c.id) ? `<div class="card" style="padding:0 14px"><details class="collapsible" style="padding:12px 0">
+        <summary><b>${esc(nomePessoa(c, i))}</b></summary><div style="margin-top:12px">${emergencyCardHtml(c, i)}</div></details></div>` : '').join('')
+        || '<div class="alert amber"><span class="ico">⚠️</span><span>Nenhuma ficha preenchida. Preencha em Saúde.</span></div>'}
       <button class="btn block" data-action="share-emergency">📤 Compartilhar informações de emergência</button>
     </div>`;
   $('#sosOverlay').hidden = false;
@@ -1428,21 +1424,25 @@ function closeSOS() {
 }
 
 /** Texto para compartilhamento das informações de emergência */
-function emergencyText() {
-  const M = S.medical, v = (k) => isBlank(M[k]) ? '(não preenchido)' : M[k];
-  const hs = CONFIG.hospitals.map(h => `• ${h.name} (${h.city}) – ${h.phone}\n  ${h.address}\n  ${S.hospitals[h.id]?.confirmed ? 'Atendimento confirmado pela família' : 'Pediatria/neurologia: A CONFIRMAR'}`).join('\n');
-  return `🆘 INFORMAÇÕES DE EMERGÊNCIA – Viagem Vale da Mantiqueira (16 a 19/11/2026)
-Hospedagem: Hotel Fazenda Vale da Mantiqueira – Virgínia/MG – (35) 3373-1900
-
-Criança: ${v('childName')}${M.childAge ? ', ' + M.childAge + ' anos' : ''}
-Condição: histórico de convulsões; uso contínuo de anticonvulsionante
+function emergencyText(onlyId) {
+  const pessoas = S.contacts.map((c, i) => ({ c, i })).filter(({ c }) => onlyId ? c.id === onlyId : temFicha(c.id));
+  const bloco = ({ c, i }) => {
+    const M = ficha(c.id), v = (k) => isBlank(M[k]) ? '(não preenchido)' : M[k];
+    return `Pessoa: ${nomePessoa(c, i)}${M.age ? ', ' + M.age + ' anos' : ''}
+Condição: ${v('condicao')}
 Medicamentos: ${v('meds')}
 Alergias: ${v('allergies')}
 Resgate: ${v('rescueMed')}
 Plano de emergência: ${v('emergencyPlan')}
 Responsável: ${v('respName')} – ${v('respPhone')}
-Neurologista: ${v('neuroName')} – ${v('neuroPhone')}
-Convênio: ${v('insurance')} – Carteirinha: ${v('insuranceCard')}
+Médico: ${v('doctorName')} – ${v('doctorPhone')}
+Convênio: ${v('insurance')} – Carteirinha: ${v('insuranceCard')}`;
+  };
+  const hs = CONFIG.hospitals.map(h => `• ${h.name} (${h.city}) – ${h.phone}\n  ${h.address}\n  ${S.hospitals[h.id]?.confirmed ? 'Atendimento confirmado pela família' : 'Pediatria/neurologia: A CONFIRMAR'}`).join('\n');
+  return `🆘 INFORMAÇÕES DE EMERGÊNCIA – Viagem Vale da Mantiqueira (16 a 19/11/2026)
+Hospedagem: Hotel Fazenda Vale da Mantiqueira – Virgínia/MG – (35) 3373-1900
+
+${pessoas.map(bloco).join('\n\n') || '(nenhuma ficha de saúde preenchida)'}
 
 SAMU: 192
 ${hs}`;
@@ -1761,41 +1761,46 @@ function importBackup(file) {
 }
 
 /* ---------- Impressão ---------- */
-function buildPrintCard() {
-  const M = S.medical, v = (k) => isBlank(M[k]) ? '______________________' : nl2br(M[k]);
-  $('#printCard').innerHTML = `<div class="pc-frame">
+function buildPrintCard(onlyId) {
+  const pessoas = S.contacts.map((c, i) => ({ c, i })).filter(({ c }) => onlyId ? c.id === onlyId : temFicha(c.id));
+  if (!pessoas.length) pessoas.push({ c: { id: '_vazio', name: '' }, i: 0 }); // cartão em branco para preencher à mão
+  $('#printCard').innerHTML = pessoas.map(({ c, i }) => printCardOne(c, i)).join('');
+}
+function printCardOne(c, i) {
+  const M = ficha(c.id), v = (k) => isBlank(M[k]) ? '______________________' : nl2br(M[k]);
+  return `<div class="pc-frame">
     <div class="pc-title"><h1>🆘 CARTÃO DE EMERGÊNCIA</h1><div style="text-align:right"><b>Viagem Vale da Mantiqueira</b><br>16 a 19/11/2026</div></div>
     <div class="pc-cols">
       <div>
         <div class="pc-box"><h2>Ligue</h2><p class="pc-big">SAMU 192</p><p>Bombeiros 193</p></div>
-        <div class="pc-box"><h2>Criança</h2>
-          <p><b>${v('childName')}</b>${M.childAge ? ' · ' + esc(M.childAge) + ' anos' : ''}</p>
-          <p>Histórico de convulsões · uso contínuo de anticonvulsionante</p>
+        <div class="pc-box"><h2>Pessoa</h2>
+          <p><b>${isBlank(c.name) ? '______________________' : esc(nomePessoa(c, i))}</b>${M.age ? ' · ' + esc(M.age) + ' anos' : ''}</p>
+          <p><b>Condição:</b> ${v('condicao')}</p>
           <p><b>Medicamentos:</b> ${v('meds')}</p>
           <p><b>Alergias:</b> ${v('allergies')}</p><p><b>Resgate:</b> ${v('rescueMed')}</p>
           <p><b>Convênio:</b> ${v('insurance')} · <b>Nº:</b> ${v('insuranceCard')}</p></div>
         <div class="pc-box"><h2>Contatos</h2>
           <p><b>Responsável:</b> ${v('respName')} · ${v('respPhone')}</p>
-          <p><b>Neurologista:</b> ${v('neuroName')} · ${v('neuroPhone')}</p>
+          <p><b>Médico:</b> ${v('doctorName')} · ${v('doctorPhone')}</p>
           <p><b>Hotel:</b> (35) 3373-1900 · (35) 2143-0284</p></div>
       </div>
       <div>
         ${CONFIG.hospitals.map(h => `<div class="pc-box"><h2>${esc(h.role)}</h2><p><b>${esc(h.name)}</b> – ${esc(h.city)}</p>
           <p class="pc-big" style="font-size:12pt">${esc(h.phone)}</p><p>${esc(h.address)}</p>
           <p class="pc-flag">${S.hospitals[h.id]?.confirmed ? '✔ Atendimento confirmado pela família' : '⚠ Pediatria/neurologia: A CONFIRMAR'}</p></div>`).join('')}
-        <div class="pc-box"><h2>Plano do neurologista</h2><p>${v('emergencyPlan')}</p></div>
+        <div class="pc-box"><h2>Plano de emergência do médico</h2><p>${v('emergencyPlan')}</p></div>
       </div>
     </div>
     <div class="pc-box"><h2>Em uma convulsão</h2><ol>${PROTOCOL.map(p => `<li>${esc(p)}</li>`).join('')}</ol>
-      <p><b>Seguir o plano individual de emergência fornecido pelo neurologista.</b></p></div>
+      <p><b>Seguir o plano individual de emergência fornecido pelo médico.</b></p></div>
     <div class="pc-cut">✂ Recorte e guarde no porta-luvas · atualizado em ${new Date().toLocaleDateString('pt-BR')}</div>
   </div>`;
 }
-function doPrint(mode) {
+function doPrint(mode, onlyId) {
   try {
     document.documentElement.setAttribute('data-theme', 'light');
     document.body.classList.toggle('print-card-mode', mode === 'card');
-    if (mode === 'card') buildPrintCard();
+    if (mode === 'card') buildPrintCard(onlyId);
     // Abre <details> para a ficha aparecer na impressão completa
     $$('details.collapsible').forEach(d => (d.dataset.wasOpen = d.open, d.open = true));
     setTimeout(() => window.print(), 50);
@@ -1920,10 +1925,10 @@ const ACTIONS = {
   'seizure-start': seizureStart,
   'seizure-stop': seizureStop,
   'clear-seizure-log': () => { if (!confirm('Apagar o registro de crises?')) return; S.seizureLog = []; commit('Registro apagado'); renderSaude(); },
-  'share-emergency': () => shareText('Informações de emergência', emergencyText()),
+  'share-emergency': el => shareText('Informações de emergência', emergencyText(el?.dataset?.id)),
   'share-trip': () => shareText('Viagem Vale da Mantiqueira', tripText()),
   'print-all': () => doPrint('all'),
-  'print-card': () => doPrint('card'),
+  'print-card': el => doPrint('card', el?.dataset?.id),
   'export': exportBackup,
   'import': () => $('#importFile').click(),
   'reset-all': () => {
@@ -1970,7 +1975,11 @@ document.addEventListener('change', (ev) => {
   } catch (e) { console.error(e); toast('Não foi possível salvar a alteração.', 'error'); }
 });
 
-document.addEventListener('toggle', (ev) => { const f = ev.target.dataset?.res; if (f) resOpen[f] = ev.target.open; }, true);
+document.addEventListener('toggle', (ev) => {
+  const d = ev.target.dataset; if (!d) return;
+  if (d.res) resOpen[d.res] = ev.target.open;
+  if (d.ficha) fichaOpen[d.ficha] = ev.target.open;
+}, true);
 document.addEventListener('input', (ev) => { if (ev.target.matches('[data-bind]')) onBoundInput(ev.target); });
 document.addEventListener('submit', (ev) => {
   const f = ev.target.closest('[data-form="add-check"]');
@@ -1993,7 +2002,10 @@ window.addEventListener('offline', updateNet);
 /** Atualiza partes derivadas após salvar (sem tirar o foco dos campos) */
 function renderDerived() {
   renderPendencies();
-  const slot = $('#emCardSlot'); if (slot) slot.innerHTML = emergencyCardHtml();
+  S.contacts.forEach((c, i) => {
+    const box = $(`[data-emcard="${c.id}"]`); if (box) box.innerHTML = emergencyCardHtml(c, i);
+    const sum = $(`details[data-ficha="${c.id}"] > summary > span`); if (sum) sum.innerHTML = fichaBadge(c.id);
+  });
 }
 function renderAll() {
   renderHome(); renderRoute(); renderSaude(); renderContatos(); renderMais();
