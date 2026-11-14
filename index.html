@@ -1472,6 +1472,12 @@ function renderContatos() {
   $('#view-contatos').innerHTML = `
     <div class="view-head"><div><h2>Contatos</h2><p class="muted small">Ligação e WhatsApp com um toque.</p></div>
       <button class="btn sm primary" data-action="add-contact" data-kind="trav">＋ Viajante</button></div>
+    <div class="card tint-green">
+      <div class="card-title"><span>🏡</span><h3>Famílias do grupo</h3></div>
+      <p class="small muted">O nome escolhido aparece na reserva do hotel, nos checklists e nos contatos de emergência.</p>
+      ${S.families.map(f => `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid var(--line)">
+        <b>${esc(f.title)}</b><button class="btn sm" data-action="rename-fam" data-fam="${f.id}">✏️ Nome</button></div>`).join('')}
+    </div>
     <h3>🧳 Viajantes (${S.contacts.length})</h3>
     ${S.contacts.map((c, i) => person(c, i, 'trav')).join('') || '<p class="muted">Nenhum contato.</p>'}
     <h3 style="margin-top:22px">🆘 Contatos de emergência das famílias</h3>
@@ -1892,8 +1898,8 @@ const ACTIONS = {
   },
   'rename-fam': el => {
     const f = S.families.find(x => x.id === el.dataset.fam); if (!f) return;
-    openForm({ title: 'Renomear família', fields: [{ key: 'title', label: 'Nome do grupo', rules: 'required|text', value: f.title }],
-      onSave: v => { f.title = v.title; commit('Nome atualizado'); renderContatos(); } });
+    openForm({ title: 'Nome da família', fields: [{ key: 'title', label: 'Nome (ex.: Família Silva)', rules: 'required|text', value: f.title }],
+      onSave: v => { f.title = v.title; commit('Nome atualizado'); renderContatos(); renderHotel(); renderChecklistView(); } });
   },
   'del-check': el => {
     const list = getChecklist(el.dataset.list); if (!list) return;
