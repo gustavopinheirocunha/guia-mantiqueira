@@ -744,6 +744,7 @@ const Store = {
 let S = Store.load();
 // Aparelhos que já tinham dados salvos com 2 famílias ganham a terceira
 if (S.families.length < 3) S.families.push({ id: 'fam3', title: 'Família 3 (avós)', contacts: [] });
+delete S.medical.dosage; // campo removido
 
 /** Salva e mostra feedback discreto */
 function commit(message, type = 'ok') {
@@ -784,15 +785,10 @@ const Sync = {
   },
   /** Define o estado atual como referência (sem marcar nada como pendente) */
   rebase(force) {
-    // Seção nunca sincronizada neste aparelho: a referência é o modelo padrão, então
-    // o que já foi preenchido aqui (antes da sincronização existir) é enviado ao grupo.
-    const def = defaultState();
-    for (const k of this.keys) {
-      if (force) { this.base[k] = JSON.stringify(S[k]); delete this.dirty[k]; }
-      else if (this.base[k] === undefined) this.base[k] = JSON.stringify(def[k]);
-    }
+    // Seção nunca sincronizada neste aparelho (base indefinida) é resolvida no primeiro run():
+    // se o grupo já tem dados, vale o do grupo; só sobe o local se o grupo não tiver nada.
+    if (force) for (const k of this.keys) { this.base[k] = JSON.stringify(S[k]); delete this.dirty[k]; }
     this.persist();
-    if (!force) this.touch();
   },
   persist() {
     try {
@@ -804,7 +800,7 @@ const Sync = {
   touch() {
     if (!this.enabled()) return;
     let any = false;
-    for (const k of this.keys) if (JSON.stringify(S[k]) !== this.base[k]) { this.dirty[k] = true; any = true; }
+    for (const k of this.keys) if (this.base[k] !== undefined && JSON.stringify(S[k]) !== this.base[k]) { this.dirty[k] = true; any = true; }
     if (any) { this.persist(); this.runSoon(); }
   },
   async api(query, opts = {}) {
@@ -826,8 +822,15 @@ const Sync = {
       for (const r of rows) {
         const k = r.chave;
         if (!this.keys.includes(k) || this.dirty[k] || r.valor == null || Array.isArray(r.valor) !== Array.isArray(def[k])) continue;
-        if (JSON.stringify(r.valor) !== JSON.stringify(S[k])) { S[k] = mergeDefaults(def[k], r.valor); changed = true; }
+        const novo = mergeDefaults(def[k], r.valor);
+        if (k === 'medical') delete novo.dosage; // campo removido
+        if (JSON.stringify(novo) !== JSON.stringify(S[k])) { S[k] = novo; changed = true; }
         this.base[k] = JSON.stringify(S[k]);
+      }
+      // Seção que o grupo ainda não tem: parte do modelo padrão; o que já existe só neste aparelho sobe
+      for (const k of this.keys) if (this.base[k] === undefined) {
+        this.base[k] = JSON.stringify(def[k]);
+        if (JSON.stringify(S[k]) !== this.base[k]) this.dirty[k] = true;
       }
       // Garante as 3 famílias mesmo se o grupo ainda tiver a versão com 2
       if (S.families.length < 3) { S.families.push(defaultState().families[2]); this.dirty.families = true; changed = true; }
