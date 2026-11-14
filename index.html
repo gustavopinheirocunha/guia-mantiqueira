@@ -412,7 +412,7 @@ dialog h3{font-family:var(--font-display);font-size:1.25rem;color:var(--heading)
 </main>
 
 <!-- Botão flutuante de emergência (sempre visível) -->
-<button class="sos-fab no-print" id="sosFab" data-action="sos" aria-label="Estou em uma emergência">SOS</button>
+<button class="sos-fab no-print" id="sosFab" data-action="sos" aria-label="SOS – emergência">SOS</button>
 
 <!-- ===================== NAVEGAÇÃO INFERIOR ===================== -->
 <nav class="bottom-nav" aria-label="Navegação principal">
@@ -676,7 +676,8 @@ function defaultState() {
     contacts: Array.from({ length: 8 }, () => ({ id: uid(), name: '', phone: '', relation: '', obs: '' })),
     families: [
       { id: uid(), title: 'Família 1', contacts: [] },
-      { id: uid(), title: 'Família 2', contacts: [] }
+      { id: uid(), title: 'Família 2', contacts: [] },
+      { id: 'fam3', title: 'Família 3 (avós)', contacts: [] }
     ],
     checklists: [
       { id: 'docs', title: 'Documentos', ico: '📄', items: mkItems(['Documentos pessoais', 'Documentos das crianças', 'Cartões do plano de saúde', 'Reserva do hotel', 'Receitas médicas']) },
@@ -733,6 +734,8 @@ const Store = {
 };
 
 let S = Store.load();
+// Aparelhos que já tinham dados salvos com 2 famílias ganham a terceira
+if (S.families.length < 3) S.families.push({ id: 'fam3', title: 'Família 3 (avós)', contacts: [] });
 
 /** Salva e mostra feedback discreto */
 function commit(message, type = 'ok') {
@@ -748,13 +751,13 @@ const commitDebounced = debounce(() => commit(), 400);
 /* =====================================================================
    4b. SINCRONIZAÇÃO ENTRE APARELHOS
    Compartilhado: roteiro, hotel, programação, hospitais, contatos,
-   famílias e despesas. Ficha médica, registro de crises e checklists
+   famílias, despesas e ficha médica. Registro de crises e checklists
    NÃO são enviados: ficam apenas neste aparelho.
    Offline: alterações ficam marcadas como pendentes e sobem quando a
    conexão voltar. Conflito: vale a última gravação de cada seção.
    ===================================================================== */
 const Sync = {
-  keys: ['route', 'hotel', 'plan', 'hospitals', 'contacts', 'families', 'info'],
+  keys: ['route', 'hotel', 'plan', 'hospitals', 'contacts', 'families', 'info', 'medical'],
   baseKey: 'guiaMantiqueira.syncBase', dirtyKey: 'guiaMantiqueira.syncDirty',
   base: {}, dirty: {}, busy: false, pendingRender: false, lastOk: null,
   enabled() { return !!(CONFIG.sync.url && CONFIG.sync.key) && Store.available; },
@@ -944,7 +947,6 @@ function renderHome() {
       <div class="countdown" id="countdown" aria-live="polite"></div>
     </div>
 
-    <button class="btn-sos-big" data-action="sos">🚨 Estou em uma emergência</button>
 
     <div class="stats">
       <div class="stat"><span class="ico">🚗</span><div><small>Saída · Seg 16/11</small><strong>${esc(dep.time || 'a definir')}</strong><small>${esc(T.origin)}</small></div></div>
@@ -956,7 +958,7 @@ function renderHome() {
       <button class="q" data-action="go" data-view="roteiro"><span class="ico">🗺️</span>Roteiro<small>Ida e volta</small></button>
       <a class="q needs-net" href="${esc(dirHref(CONFIG.places.hotel.query))}" target="_blank" rel="noopener"><span class="ico">🧭</span>Mapa<small>Navegar ao hotel · 🌐</small></a>
       <button class="q" data-action="go" data-view="contatos"><span class="ico">📇</span>Contatos<small>Viajantes e famílias</small></button>
-      <button class="q em" data-action="go" data-view="saude"><span class="ico">❤️‍🩹</span>Emergência<small>Hospitais e ficha médica</small></button>
+      <button class="q em" data-action="go" data-view="saude"><span class="ico">❤️‍🩹</span>Saúde<small>Hospitais e ficha médica</small></button>
     </div>
 
     <div class="card">
@@ -1257,7 +1259,6 @@ function renderSaude() {
   const log = S.seizureLog.slice().reverse().slice(0, 10);
   $('#view-saude').innerHTML = `
     <div class="view-head"><div><h2>Saúde e emergência</h2><p class="muted small">Seção prioritária — disponível sem internet.</p></div></div>
-    <button class="btn-sos-big" data-action="sos">🚨 Estou em uma emergência</button>
     ${neuroWarning()}
     <div id="emCardSlot">${emergencyCardHtml()}</div>
     <div class="btn-row no-print" style="margin:-4px 0 16px">
@@ -1644,7 +1645,7 @@ function renderMais() {
     </div>
     <div class="card">
       <div class="card-title"><span>💾</span><h3>Backup dos dados</h3></div>
-      <p class="small muted">Roteiro, hotel, programação, hospitais, contatos e despesas são compartilhados com todos os viajantes. Ficha médica e checklists ficam só neste aparelho. Sem internet, tudo continua funcionando e as alterações sobem quando a conexão voltar.</p>
+      <p class="small muted">Roteiro, hotel, programação, hospitais, contatos, despesas e ficha médica são compartilhados com todos os viajantes. Checklists ficam só neste aparelho. Sem internet, tudo continua funcionando e as alterações sobem quando a conexão voltar.</p>
       <p class="small">Sincronização: ${Sync.status()}</p>
       <p class="small">Armazenamento local: ${Store.available ? '<span class="badge ok">ATIVO</span>' : '<span class="badge red">BLOQUEADO</span>'}
         ${S.meta.updatedAt ? ` · última alteração ${esc(fmtDateTime(S.meta.updatedAt))}` : ''}</p>
@@ -1887,7 +1888,7 @@ const ACTIONS = {
   'export': exportBackup,
   'import': () => $('#importFile').click(),
   'reset-all': () => {
-    if (!confirm('Apagar os dados DESTE APARELHO (ficha médica, checklists)? Os dados compartilhados do grupo não são apagados. Recomenda-se exportar um backup antes.')) return;
+    if (!confirm('Apagar os dados DESTE APARELHO (checklists, registro de crises)? Os dados compartilhados do grupo não são apagados. Recomenda-se exportar um backup antes.')) return;
     if (!confirm('Tem certeza? Esta ação não pode ser desfeita.')) return;
     // Não propaga o apagamento ao grupo: os dados compartilhados voltam na próxima sincronização
     S = defaultState(); Sync.rebase(true); commit('Dados apagados'); renderAll(); Sync.run();
