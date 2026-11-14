@@ -641,6 +641,18 @@ function validate(value, rules) {
    ===================================================================== */
 const mkItems = (arr) => arr.map(text => ({ id: uid(), text, done: false }));
 
+const FAMS = ['f1', 'f2', 'f3'];
+/** Checklists de uma família (cada família tem o seu conjunto) */
+const mkFamChecklists = () => ({
+  hotel: { id: 'hotel', title: 'Checklist de hospedagem', ico: '🧳', items: mkItems(['Documentos', 'Medicamentos', 'Roupas', 'Itens de higiene', 'Carregadores', 'Outros itens pessoais']) },
+  lists: [
+    { id: 'docs', title: 'Documentos', ico: '📄', items: mkItems(['Documentos pessoais', 'Documentos das crianças', 'Cartões do plano de saúde', 'Reserva do hotel', 'Receitas médicas']) },
+    { id: 'saude', title: 'Saúde', ico: '💊', items: mkItems(['Medicamentos de uso contínuo', 'Medicamentos de reserva', 'Medicamento de resgate, se prescrito', 'Termômetro', 'Kit de primeiros socorros']) },
+    { id: 'viagem', title: 'Viagem', ico: '🚗', items: mkItems(['Carregadores', 'Power banks', 'Água', 'Lanches', 'Óculos de sol', 'Protetor solar', 'Repelente']) },
+    { id: 'hosp', title: 'Hospedagem', ico: '🛏️', items: mkItems(['Roupas', 'Roupas de banho', 'Calçados', 'Produtos de higiene pessoal']) }
+  ]
+});
+
 function defaultState() {
   return {
     meta: { schemaVersion: CONFIG.schemaVersion, updatedAt: null },
@@ -658,8 +670,10 @@ function defaultState() {
         { id: 'v5', kind: 'chegada', label: 'Chegada estimada', title: 'São Pedro da Aldeia – RJ', place: 'origem', time: '19:30–20:30', detail: '', notes: '' }
       ]
     },
-    hotel: { reserva: '', responsavel: '', obs: '' },
-    hotelChecklist: { id: 'hotel', title: 'Checklist de hospedagem', ico: '🧳', items: mkItems(['Documentos', 'Medicamentos', 'Roupas', 'Itens de higiene', 'Carregadores', 'Outros itens pessoais']) },
+    // Dados por família (f1, f2, f3): reserva do hotel e checklists
+    reservas: Object.fromEntries(FAMS.map(f => [f, { reserva: '', responsavel: '', obs: '' }])),
+    chk_f1: mkFamChecklists(), chk_f2: mkFamChecklists(), chk_f3: mkFamChecklists(),
+    myFam: 'f1', // família escolhida neste aparelho (não sincroniza)
     plan: [
       { id: 'd17', title: 'Terça-feira, 17/11', items: [
         { id: uid(), time: '', text: 'Conferir horários do medicamento de uso contínuo (conforme ficha médica)', done: false },
@@ -686,12 +700,6 @@ function defaultState() {
       { id: uid(), title: 'Família 1', contacts: [] },
       { id: uid(), title: 'Família 2', contacts: [] },
       { id: 'fam3', title: 'Família 3 (avós)', contacts: [] }
-    ],
-    checklists: [
-      { id: 'docs', title: 'Documentos', ico: '📄', items: mkItems(['Documentos pessoais', 'Documentos das crianças', 'Cartões do plano de saúde', 'Reserva do hotel', 'Receitas médicas']) },
-      { id: 'saude', title: 'Saúde', ico: '💊', items: mkItems(['Medicamentos de uso contínuo', 'Medicamentos de reserva', 'Medicamento de resgate, se prescrito', 'Termômetro', 'Kit de primeiros socorros']) },
-      { id: 'viagem', title: 'Viagem', ico: '🚗', items: mkItems(['Carregadores', 'Power banks', 'Água', 'Lanches', 'Óculos de sol', 'Protetor solar', 'Repelente']) },
-      { id: 'hosp', title: 'Hospedagem', ico: '🛏️', items: mkItems(['Roupas', 'Roupas de banho', 'Calçados', 'Produtos de higiene pessoal']) }
     ],
     info: { fuel: '', tolls: '', expenses: [], notes: '' },
     seizure: { running: false, start: null },
@@ -742,9 +750,15 @@ const Store = {
 };
 
 let S = Store.load();
-// Aparelhos que já tinham dados salvos com 2 famílias ganham a terceira
-if (S.families.length < 3) S.families.push({ id: 'fam3', title: 'Família 3 (avós)', contacts: [] });
 delete S.medical.dosage; // campo removido
+if (!FAMS.includes(S.myFam)) S.myFam = 'f1';
+/** Atalhos para os dados da família selecionada neste aparelho */
+const CL = () => S['chk_' + S.myFam].lists;
+const HCL = () => S['chk_' + S.myFam].hotel;
+const famTitle = (f) => S.families[FAMS.indexOf(f)]?.title || 'Família ' + (FAMS.indexOf(f) + 1);
+const famPicker = () => `<div class="seg" role="group" aria-label="Família" style="margin-bottom:12px">${FAMS.map(f =>
+  `<button data-action="set-fam" data-fam="${f}" aria-pressed="${S.myFam === f}">${esc(famTitle(f))}</button>`).join('')}</div>`;
+const resOpen = {}; // quais reservas estão abertas (mantém ao redesenhar)
 
 /** Salva e mostra feedback discreto */
 function commit(message, type = 'ok') {
@@ -760,13 +774,13 @@ const commitDebounced = debounce(() => commit(), 400);
 /* =====================================================================
    4b. SINCRONIZAÇÃO ENTRE APARELHOS
    Compartilhado: roteiro, hotel, programação, hospitais, contatos,
-   famílias, despesas e ficha médica. Registro de crises e checklists
-   NÃO são enviados: ficam apenas neste aparelho.
+   famílias, despesas, ficha médica, reservas e checklists (por família).
+   Registro de crises e a família escolhida ficam apenas neste aparelho.
    Offline: alterações ficam marcadas como pendentes e sobem quando a
    conexão voltar. Conflito: vale a última gravação de cada seção.
    ===================================================================== */
 const Sync = {
-  keys: ['route', 'hotel', 'plan', 'hospitals', 'contacts', 'families', 'info', 'medical'],
+  keys: ['route', 'reservas', 'chk_f1', 'chk_f2', 'chk_f3', 'plan', 'hospitals', 'contacts', 'families', 'info', 'medical'],
   baseKey: 'guiaMantiqueira.syncBase', dirtyKey: 'guiaMantiqueira.syncDirty',
   base: {}, dirty: {}, busy: false, pendingRender: false, lastOk: null,
   enabled() { return !!(CONFIG.sync.url && CONFIG.sync.key) && Store.available; },
@@ -776,6 +790,8 @@ const Sync = {
       this.base = JSON.parse(localStorage.getItem(this.baseKey) || '{}');
       this.dirty = JSON.parse(localStorage.getItem(this.dirtyKey) || '{}');
     } catch { this.base = {}; this.dirty = {}; }
+    // Campo removido não pode contar como "alteração local" (evitaria sobrescrever dados mais novos do grupo)
+    try { if (this.base.medical) { const m = JSON.parse(this.base.medical); delete m.dosage; this.base.medical = JSON.stringify(m); } } catch { delete this.base.medical; }
     this.rebase(false);
     window.addEventListener('online', () => this.run());
     document.addEventListener('visibilitychange', () => { if (!document.hidden) this.run(); });
@@ -1017,14 +1033,14 @@ function renderPendencies() {
   const hospPending = CONFIG.hospitals.filter(h => !S.hospitals[h.id]?.confirmed).length;
   const contactsFilled = S.contacts.filter(c => !isBlank(c.name) && !isBlank(c.phone)).length;
   const famFilled = S.families.reduce((n, f) => n + f.contacts.length, 0);
-  const all = S.checklists.flatMap(c => c.items);
+  const all = CL().flatMap(c => c.items);
   const pct = all.length ? Math.round(all.filter(i => i.done).length / all.length * 100) : 0;
   const rows = [
     [hospPending === 0, hospPending ? `Confirmar ${hospPending} hospital(is): pediatria e emergência neurológica` : 'Hospitais confirmados', 'saude'],
     [medMissing === 0, medMissing ? `Ficha médica: ${medMissing} campo(s) essencial(is) vazio(s)` : 'Ficha médica preenchida', 'saude'],
     [contactsFilled >= 8, `Contatos dos viajantes: ${contactsFilled} de 8 preenchidos`, 'contatos'],
     [famFilled > 0, famFilled ? `${famFilled} contato(s) de emergência das famílias` : 'Cadastrar contatos de emergência das famílias', 'contatos'],
-    [!isBlank(S.hotel.reserva), isBlank(S.hotel.reserva) ? 'Informar número da reserva do hotel' : 'Reserva do hotel registrada', 'hotel'],
+    [!isBlank(S.reservas[S.myFam].reserva), isBlank(S.reservas[S.myFam].reserva) ? 'Informar número da reserva do hotel' : 'Reserva do hotel registrada', 'hotel'],
     [pct === 100, `Checklist geral: ${pct}% concluído`, 'checklist']
   ];
   ul.innerHTML = rows.map(([ok, txt, view]) => `<li><span class="dot ${ok ? 'ok' : ''}"></span><span class="txt">${esc(txt)}</span>
@@ -1122,13 +1138,18 @@ function renderHotel() {
 
     <div class="card">
       <div class="card-title"><span>🧾</span><h3>Dados da reserva</h3></div>
-      ${field({ bind: 'hotel.reserva', label: 'Número da reserva', rules: 'text', placeholder: 'Ex.: 123456' })}
-      ${field({ bind: 'hotel.responsavel', label: 'Responsável pela reserva', rules: 'text' })}
-      ${field({ bind: 'hotel.obs', label: 'Observações', type: 'textarea', rules: 'longtext', placeholder: 'Ex.: regime de pensão, tipo de quarto, pedidos especiais...' })}
+      <p class="small muted">Cada família tem sua reserva. Toque para abrir.</p>
+      ${FAMS.map(f => `<details class="collapsible" data-res="${f}" ${resOpen[f] ? 'open' : ''} style="border-top:1px solid var(--line);padding:10px 0">
+        <summary><b>${esc(famTitle(f))}</b>${isBlank(S.reservas[f].reserva) ? '<span class="small muted" style="margin-left:auto">sem reserva</span>' : `<span class="small" style="margin-left:auto">🧾 ${esc(S.reservas[f].reserva)}</span>`}</summary>
+        <div style="margin-top:10px">
+        ${field({ bind: `reservas.${f}.reserva`, label: 'Número da reserva', rules: 'text', placeholder: 'Ex.: 123456' })}
+        ${field({ bind: `reservas.${f}.responsavel`, label: 'Responsável pela reserva', rules: 'text' })}
+        ${field({ bind: `reservas.${f}.obs`, label: 'Observações', type: 'textarea', rules: 'longtext', placeholder: 'Ex.: regime de pensão, tipo de quarto, pedidos especiais...' })}
+        </div></details>`).join('')}
     </div>
 
-    <div class="card" id="hotelChecklistCard"></div>`;
-  renderChecklistCard($('#hotelChecklistCard'), S.hotelChecklist);
+    <div class="card"><p class="small muted" style="margin:0 0 8px">Checklist de hospedagem — escolha sua família:</p>${famPicker()}<div id="hotelChecklistCard"></div></div>`;
+  renderChecklistCard($('#hotelChecklistCard'), HCL());
 }
 
 /* =====================================================================
@@ -1488,7 +1509,7 @@ function editContact(kind, famId, id) {
 /* =====================================================================
    13. CHECKLISTS
    ===================================================================== */
-function getChecklist(id) { return id === 'hotel' ? S.hotelChecklist : S.checklists.find(c => c.id === id); }
+function getChecklist(id) { return id === 'hotel' ? HCL() : CL().find(c => c.id === id); }
 
 function renderChecklistCard(container, list) {
   const done = list.items.filter(i => i.done).length;
@@ -1508,20 +1529,21 @@ function renderChecklistCard(container, list) {
 }
 
 function renderChecklistView() {
-  const all = S.checklists.flatMap(c => c.items);
+  const all = CL().flatMap(c => c.items);
   const pct = all.length ? Math.round(all.filter(i => i.done).length / all.length * 100) : 0;
   $('#view-checklist').innerHTML = `
-    <div class="view-head"><div><h2>Checklist da viagem</h2><p class="muted small">Marcações ficam salvas neste aparelho.</p></div>
+    <div class="view-head"><div><h2>Checklist da viagem</h2><p class="muted small">Cada família tem o seu. Escolha a sua abaixo.</p></div>
       <button class="btn sm ghost" data-action="go" data-view="inicio">‹ Início</button></div>
+    ${famPicker()}
     <div class="card tint-green"><div class="progress-label"><b>Progresso geral</b><b>${pct}%</b></div>
       <div class="progress"><span style="width:${pct}%"></span></div></div>
-    ${S.checklists.map(c => `<div class="card" data-checklist="${c.id}"></div>`).join('')}
+    ${CL().map(c => `<div class="card" data-checklist="${c.id}"></div>`).join('')}
     <button class="btn block ghost" data-action="reset-checks">↺ Desmarcar todos os itens</button>`;
-  S.checklists.forEach(c => renderChecklistCard($(`[data-checklist="${c.id}"]`), c));
+  CL().forEach(c => renderChecklistCard($(`[data-checklist="${c.id}"]`), c));
 }
 
 function rerenderChecklist(listId) {
-  if (listId === 'hotel') renderChecklistCard($('#hotelChecklistCard'), S.hotelChecklist);
+  if (listId === 'hotel') renderChecklistCard($('#hotelChecklistCard'), HCL());
   else renderChecklistView();
 }
 
@@ -1655,7 +1677,7 @@ function renderMais() {
     </div>
     <div class="card">
       <div class="card-title"><span>💾</span><h3>Backup dos dados</h3></div>
-      <p class="small muted">Roteiro, hotel, programação, hospitais, contatos, despesas e ficha médica são compartilhados com todos os viajantes. Checklists ficam só neste aparelho. Sem internet, tudo continua funcionando e as alterações sobem quando a conexão voltar.</p>
+      <p class="small muted">Roteiro, hotel, programação, hospitais, contatos, despesas, ficha médica, reservas e checklists (um por família) são compartilhados com todos os viajantes. Sem internet, tudo continua funcionando e as alterações sobem quando a conexão voltar.</p>
       <p class="small">Sincronização: ${Sync.status()}</p>
       <p class="small">Armazenamento local: ${Store.available ? '<span class="badge ok">ATIVO</span>' : '<span class="badge red">BLOQUEADO</span>'}
         ${S.meta.updatedAt ? ` · última alteração ${esc(fmtDateTime(S.meta.updatedAt))}` : ''}</p>
@@ -1674,7 +1696,7 @@ function tripText() {
 🏨 Hotel Fazenda Vale da Mantiqueira – Virgínia/MG
 📅 16/11/2026 a 19/11/2026 · ${CONFIG.trip.group}
 ☎️ Hotel: (35) 3373-1900 / (35) 2143-0284
-${S.hotel.reserva ? '🧾 Reserva: ' + S.hotel.reserva + (S.hotel.responsavel ? ' (' + S.hotel.responsavel + ')' : '') + '\n' : ''}
+${FAMS.filter(f => S.reservas[f].reserva).map(f => `🧾 Reserva ${famTitle(f)}: ${S.reservas[f].reserva}${S.reservas[f].responsavel ? ' (' + S.reservas[f].responsavel + ')' : ''}\n`).join('')}
 ➡️ IDA (16/11)
 ${r.ida.map(line).join('\n')}
 
@@ -1721,7 +1743,7 @@ function importBackup(file) {
       if (j.app !== CONFIG.appId || typeof j.data !== 'object' || !j.data) throw new Error('formato');
       if (!confirm('Importar este backup substituirá os dados atuais deste aparelho. Continuar?')) return;
       S = mergeDefaults(defaultState(), j.data);
-      if (!Array.isArray(S.contacts) || !Array.isArray(S.checklists) || !S.route?.ida) throw new Error('estrutura');
+      if (!Array.isArray(S.contacts) || !Array.isArray(S.chk_f1?.lists) || !S.route?.ida) throw new Error('estrutura');
       commit('Backup importado com sucesso', 'ok');
       renderAll();
     } catch (e) {
@@ -1848,6 +1870,7 @@ $('#formDialog').addEventListener('submit', (ev) => {
    ===================================================================== */
 const ACTIONS = {
   'go': el => go(el.dataset.view),
+  'set-fam': el => { S.myFam = el.dataset.fam; commit(); renderHotel(); renderChecklistView(); },
   'sos': openSOS,
   'close-sos': closeSOS,
   'leg': el => { currentLeg = el.dataset.leg; renderRoute(); },
@@ -1880,7 +1903,7 @@ const ACTIONS = {
   },
   'reset-checks': () => {
     if (!confirm('Desmarcar todos os itens do checklist geral?')) return;
-    S.checklists.forEach(c => c.items.forEach(i => (i.done = false))); commit('Checklist reiniciado'); renderChecklistView();
+    CL().forEach(c => c.items.forEach(i => (i.done = false))); commit('Checklist reiniciado'); renderChecklistView();
   },
   'add-expense': () => openForm({ title: 'Nova despesa', fields: [
       { key: 'desc', label: 'Descrição', rules: 'required|text', placeholder: 'Ex.: lanche na estrada' },
@@ -1898,7 +1921,7 @@ const ACTIONS = {
   'export': exportBackup,
   'import': () => $('#importFile').click(),
   'reset-all': () => {
-    if (!confirm('Apagar os dados DESTE APARELHO (checklists, registro de crises)? Os dados compartilhados do grupo não são apagados. Recomenda-se exportar um backup antes.')) return;
+    if (!confirm('Apagar os dados DESTE APARELHO (registro de crises e cópia local)? Os dados compartilhados do grupo não são apagados. Recomenda-se exportar um backup antes.')) return;
     if (!confirm('Tem certeza? Esta ação não pode ser desfeita.')) return;
     // Não propaga o apagamento ao grupo: os dados compartilhados voltam na próxima sincronização
     S = defaultState(); Sync.rebase(true); commit('Dados apagados'); renderAll(); Sync.run();
@@ -1941,6 +1964,7 @@ document.addEventListener('change', (ev) => {
   } catch (e) { console.error(e); toast('Não foi possível salvar a alteração.', 'error'); }
 });
 
+document.addEventListener('toggle', (ev) => { const f = ev.target.dataset?.res; if (f) resOpen[f] = ev.target.open; }, true);
 document.addEventListener('input', (ev) => { if (ev.target.matches('[data-bind]')) onBoundInput(ev.target); });
 document.addEventListener('submit', (ev) => {
   const f = ev.target.closest('[data-form="add-check"]');
