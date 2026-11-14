@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f5d46">
+<meta name="description" content="Guia interativo da viagem em família ao Hotel Fazenda Vale da Mantiqueira – Virgínia/MG, 16 a 19/11/2026.">
+<title>Guia da Viagem – Vale da Mantiqueira</title>
+<script>
+/* Tema: 'auto' (segue o sistema), 'light' ou 'dark'. Preferência do aparelho,
+   guardada separadamente dos dados da viagem (não entra no backup). */
+(function () {
+  var pref = 'auto';
+  try { pref = localStorage.getItem('guiaMantiqueira.theme') || 'auto'; } catch (e) {}
+  var dark = pref === 'dark' || (pref === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme-pref', pref);
+})();
+</script>
+<style>
+/* =====================================================================
+   1. TOKENS DE DESIGN (cores da Mantiqueira)
+   ===================================================================== */
+:root{
+  --green-900:#1d3a2c; --green:#2f5d46; --green-600:#3d7458; --green-100:#e4efe7;
+  --blue:#2c6787; --blue-100:#e1edf4;
+  --earth:#8b6b4a; --earth-100:#f2e9dd;
+  --cream:#f7f4ee; --white:#ffffff; --ink:#1d2823; --muted:#5d6a63; --line:#e3ddd2;
+  --red:#c0262d; --red-700:#991b21; --red-100:#fde9e9;
+  --amber:#a35f00; --amber-100:#fff2d9;
+  --ok:#2e7d4f; --ok-100:#e3f4e9;
+  /* Tokens semânticos (trocados no tema escuro) */
+  --bg:var(--cream); --surface:#ffffff; --surface-2:#ece6db; --surface-3:#f0ebe2;
+  --heading:#1d3a2c; --topbar:#1d3a2c; --on-accent:#ffffff;
+  --input-border:#cfc8bb; --disabled:#b9b3a8;
+  --blue-ink:#2c6787; --green-ink:#2f5d46; --red-ink:#991b21; --amber-ink:#6b3f00;
+  --line-green:#cfe1d5; --line-blue:#cbdfeb; --line-earth:#e4d6c3; --line-amber:#f0cf8f; --line-red:#f2b9bb;
+  --toast-bg:#1d2823; --toast-ink:#ffffff;
+  --radius:16px; --radius-sm:10px;
+  --shadow:0 1px 2px rgba(29,40,35,.06),0 4px 14px rgba(29,40,35,.07);
+  color-scheme:light;
+  --nav-h:64px;
+  --font: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-display: Georgia,"Times New Roman",serif;
+}
+/* ---------- TEMA ESCURO: noite na serra ----------
+   Aplicado via data-theme="dark" (definido pelo script do <head>,
+   conforme a preferência: Automático / Claro / Escuro). */
+:root[data-theme="dark"]{
+  --green-900:#cfe6d6; --green:#3b7a5a; --green-600:#4f9370; --green-100:#16271e;
+  --blue:#2f6f93; --blue-100:#14232d;
+  --earth:#9a7a58; --earth-100:#2a2119;
+  --cream:#0f1512; --ink:#e7ece8; --muted:#a3b1a9; --line:#2c3833;
+  --red:#d0343b; --red-700:#ff9ea2; --red-100:#3a1416;
+  --amber:#f0b45a; --amber-100:#2d220f;
+  --ok:#6fcf97; --ok-100:#133022;
+  --bg:#0f1512; --surface:#18211d; --surface-2:#232e29; --surface-3:#202a25;
+  --heading:#d7ebdd; --topbar:#0b120f;
+  --input-border:#3c4a43; --disabled:#4a544f;
+  --blue-ink:#8cc6e6; --green-ink:#8fd1aa; --red-ink:#ff9ea2; --amber-ink:#f3c983;
+  --line-green:#2a4535; --line-blue:#24404f; --line-earth:#4a3a29; --line-amber:#5c4519; --line-red:#6a2a2d;
+  --toast-bg:#e7ece8; --toast-ink:#0f1512;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.3);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--font);font-size:16px;line-height:1.5;color:var(--ink);background:var(--bg);transition:background-color .25s,color .25s;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px)}
+h1,h2,h3{line-height:1.2;margin:0 0 .4em}
+h2{font-family:var(--font-display);font-size:1.45rem;color:var(--heading)}
+h3{font-size:1.05rem}
+p{margin:0 0 .6em}
+a{color:var(--blue-ink)}
+button,input,textarea,select{font:inherit;color:inherit}
+.muted{color:var(--muted)} .small{font-size:.86rem}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* =====================================================================
+   2. ESTRUTURA: topo, conteúdo, navegação inferior
+   ===================================================================== */
+.topbar{position:sticky;top:0;z-index:30;background:var(--topbar);color:#fff;padding:env(safe-area-inset-top) 0 0}
+.topbar-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:8px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-mark{font-size:1.5rem}
+.brand strong{display:block;font-family:var(--font-display);font-size:1.05rem;white-space:nowrap}
+.brand small{opacity:.8;font-size:.78rem;white-space:nowrap}
+.top-actions{display:flex;gap:6px;align-items:center}
+.pill{font-size:.72rem;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.14);white-space:nowrap}
+.pill.offline{background:#a35f00}
+.theme-btn{border:0;background:rgba(255,255,255,.14);color:#fff;width:36px;height:32px;border-radius:99px;font-size:1rem;cursor:pointer;line-height:1}
+.theme-btn:active{transform:scale(.94)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface-2);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:9px;min-height:44px;font-weight:700;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--heading);box-shadow:var(--shadow)}
+.save-badge{opacity:0;transition:opacity .3s}
+.save-badge.show{opacity:1}
+
+main{max-width:760px;margin:0 auto;padding:16px}
+.view{display:none;animation:fade .2s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:4px 0 12px}
+.view-head p{margin:0}
+
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav ul{list-style:none;margin:0 auto;padding:0;max-width:760px;display:grid;grid-template-columns:repeat(5,1fr);height:var(--nav-h)}
+.bottom-nav button{width:100%;height:100%;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font-size:.72rem;color:var(--muted);cursor:pointer}
+.bottom-nav .ico{font-size:1.35rem;line-height:1}
+.bottom-nav button[aria-current="page"]{color:var(--green-ink);font-weight:700}
+.bottom-nav button[aria-current="page"] .ico{transform:translateY(-1px)}
+.bottom-nav .nav-sos{color:var(--red-ink);font-weight:700}
+
+.sos-fab{position:fixed;right:16px;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 14px);z-index:45;
+  width:64px;height:64px;border-radius:50%;border:3px solid var(--surface);background:var(--red);color:#fff;font-weight:800;font-size:1rem;
+  box-shadow:0 6px 18px rgba(192,38,45,.45);cursor:pointer}
+.sos-fab:active{transform:scale(.95)}
+
+/* =====================================================================
+   3. COMPONENTES: cards, botões, badges, formulários
+   ===================================================================== */
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px;border:1px solid var(--line)}
+.card-title{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.card-title h3{margin:0}
+.card.tint-green{background:var(--green-100);border-color:var(--line-green)}
+.card.tint-blue{background:var(--blue-100);border-color:var(--line-blue)}
+.card.tint-earth{background:var(--earth-100);border-color:var(--line-earth)}
+.card.danger{border:2px solid var(--red);background:var(--surface)}
+.card.warn{background:var(--amber-100);border-color:var(--line-amber)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:9px 14px;border-radius:12px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink);font-weight:600;font-size:.92rem;text-decoration:none;cursor:pointer;line-height:1.2;text-align:center}
+.btn:active{transform:scale(.98)}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.45;pointer-events:none}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:6px 10px;font-size:.84rem;border-radius:10px}
+.btn.block{width:100%}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.btn-row .btn{flex:1 1 auto}
+.net-tag{font-size:.68rem;font-weight:600;padding:1px 6px;border-radius:99px;background:var(--blue-100);color:var(--blue-ink);white-space:nowrap}
+.btn.blue .net-tag,.btn.primary .net-tag,.btn.red .net-tag{background:rgba(255,255,255,.22);color:#fff}
+
+.badge{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.02em;white-space:nowrap}
+.badge.inf{background:var(--blue-100);color:var(--blue-ink)}
+.badge.conf{background:var(--amber-100);color:var(--amber);border:1px solid var(--line-amber)}
+.badge.ok{background:var(--ok-100);color:var(--ok)}
+.badge.red{background:var(--red-100);color:var(--red-ink)}
+
+.field{margin-bottom:12px}
+.field label{display:block;font-weight:600;font-size:.88rem;margin-bottom:4px}
+.field input,.field textarea,.field select{width:100%;padding:11px 12px;border:1px solid var(--input-border);border-radius:var(--radius-sm);background:var(--surface);min-height:44px}
+.field textarea{min-height:84px;resize:vertical}
+.field input:focus,.field textarea:focus{outline:3px solid rgba(47,93,70,.25);border-color:var(--green)}
+.field .hint{font-size:.78rem;color:var(--muted);margin-top:3px}
+.field .err{font-size:.8rem;color:var(--red-ink);margin-top:3px;font-weight:600}
+.field.invalid input,.field.invalid textarea{border-color:var(--red);background:var(--red-100)}
+.grid-2{display:grid;grid-template-columns:1fr;gap:0 12px}
+
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:.92rem;margin:0}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:600}
+
+.list-plain{list-style:none;padding:0;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{font-size:.8rem;background:var(--cream);border:1px solid var(--line);padding:4px 10px;border-radius:99px}
+
+/* =====================================================================
+   4. INÍCIO
+   ===================================================================== */
+.hero{border-radius:22px;padding:22px 18px 18px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#2c6787 0%,#2f5d46 55%,#1d3a2c 100%)}
+.hero::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-30px;height:90px;
+  background:radial-gradient(60% 90px at 25% 100%,rgba(255,255,255,.12),transparent 70%),radial-gradient(50% 80px at 80% 100%,rgba(255,255,255,.09),transparent 70%)}
+.hero .kicker{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.hero h1{font-family:var(--font-display);font-size:1.75rem;margin:.2em 0 .3em}
+.hero p{margin:0 0 4px;opacity:.95}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;position:relative;z-index:1}
+.countdown .cd{background:rgba(255,255,255,.14);border-radius:12px;padding:8px 4px;text-align:center}
+.countdown .cd b{display:block;font-size:1.5rem;line-height:1.1}
+.countdown .cd span{font-size:.7rem;opacity:.85;text-transform:uppercase;letter-spacing:.06em}
+.countdown .cd-msg{grid-column:1/-1;background:rgba(255,255,255,.16);border-radius:12px;padding:10px;text-align:center;font-weight:600}
+.stats{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+.stat .ico{font-size:1.5rem}
+.stat small{display:block;color:var(--muted);font-size:.78rem}
+.stat strong{display:block}
+.btn-sos-big{display:flex;width:100%;align-items:center;justify-content:center;gap:10px;min-height:62px;margin:0 0 14px;
+  border:0;border-radius:16px;background:var(--red);color:#fff;font-size:1.1rem;font-weight:800;box-shadow:0 6px 16px rgba(192,38,45,.35);cursor:pointer}
+.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.quick .q{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;
+  text-decoration:none;color:var(--ink);cursor:pointer;box-shadow:var(--shadow);text-align:left;font-weight:700}
+.quick .q .ico{font-size:1.5rem}
+.quick .q small{font-weight:500;color:var(--muted);font-size:.78rem}
+.quick .q.em{background:var(--red-100);border-color:var(--line-red);color:var(--red-ink)}
+.pend li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.pend li:last-child{border-bottom:0}
+.pend .dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--amber)}
+.pend .dot.ok{background:var(--ok)}
+.pend .txt{flex:1}
+.pend button{border:0;background:none;color:var(--blue-ink);font-weight:600;cursor:pointer;padding:4px}
+
+/* =====================================================================
+   5. ROTEIRO (linha do tempo)
+   ===================================================================== */
+.leg-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface-2);border-radius:12px;padding:4px;margin-bottom:12px}
+.leg-tabs button{border:0;background:none;border-radius:9px;min-height:42px;font-weight:700;color:var(--muted);cursor:pointer}
+.leg-tabs button[aria-selected="true"]{background:var(--surface);color:var(--heading);box-shadow:var(--shadow)}
+.timeline{list-style:none;margin:0;padding:0 0 0 4px;position:relative}
+.timeline::before{content:"";position:absolute;left:58px;top:8px;bottom:8px;width:3px;background:linear-gradient(var(--green),var(--blue));border-radius:3px}
+.tl{display:grid;grid-template-columns:52px 1fr;gap:18px;margin-bottom:14px;position:relative}
+.tl-time{font-weight:800;font-size:.86rem;color:var(--heading);text-align:right;padding-top:14px;word-break:break-word}
+.tl-body{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);position:relative}
+.tl-body::before{content:"";position:absolute;left:-17px;top:16px;width:13px;height:13px;border-radius:50%;background:var(--surface);border:3px solid var(--green)}
+.tl.stop .tl-body{border-color:var(--line-earth);background:var(--earth-100)}
+.tl.stop .tl-body::before{border-color:var(--earth)}
+.tl.arrive .tl-body::before{border-color:var(--blue);background:var(--blue)}
+.tl-label{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tl h3{margin:2px 0 4px}
+.tl .addr{font-size:.86rem;color:var(--muted)}
+.note{background:var(--cream);border-left:3px solid var(--earth);padding:6px 10px;border-radius:6px;font-size:.88rem;margin-top:6px;white-space:pre-wrap}
+
+/* =====================================================================
+   6. SAÚDE E EMERGÊNCIA
+   ===================================================================== */
+.alert{display:flex;gap:10px;padding:12px 14px;border-radius:14px;margin-bottom:14px;font-weight:600}
+.alert.red{background:var(--red);color:#fff}
+.alert.amber{background:var(--amber-100);color:var(--amber-ink);border:1px solid var(--line-amber)}
+.alert .ico{font-size:1.3rem;line-height:1.2}
+.em-card{border:2px solid var(--red);border-radius:var(--radius);background:var(--surface);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow)}
+.em-card header{background:var(--red);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.em-card header h3{margin:0;font-size:1rem;letter-spacing:.04em}
+.em-card .em-body{padding:12px 14px}
+.em-card .missing{color:var(--amber);font-weight:600;font-style:italic}
+.hosp-fact{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+.hosp-fact:last-child{border-bottom:0}
+.hosp-fact span:first-child{color:var(--muted)}
+.hosp-fact .v{text-align:right;font-weight:600}
+.check-row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--cream);margin-top:10px}
+.check-row input{width:22px;height:22px;accent-color:var(--green);flex:none}
+.protocol{counter-reset:p;list-style:none;padding:0;margin:0}
+.protocol li{counter-increment:p;display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.98rem}
+.protocol li:last-child{border-bottom:0}
+.protocol li::before{content:counter(p);flex:none;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;font-weight:800;display:grid;place-items:center;font-size:.9rem}
+.protocol li.crit::before{background:var(--red)}
+.protocol li.crit{font-weight:700;color:var(--red-ink)}
+.timer{border-radius:14px;padding:14px;background:var(--green-100);text-align:center;margin-bottom:12px}
+.timer .clock{font-size:2.6rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.1}
+.timer .since{font-size:.85rem;color:var(--muted)}
+.timer.running{background:var(--amber-100)}
+.timer.alarm{background:var(--red);color:#fff;animation:pulse 1s infinite}
+.timer.alarm .since{color:#fff}
+.timer.alarm .call-big{background:#fff;color:#c0262d;box-shadow:none}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(192,38,45,.25)}}
+.log li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:.88rem}
+
+/* Overlay "Estou em uma emergência" */
+.sos-overlay{position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sos-overlay[hidden]{display:none}
+.sos-head{position:sticky;top:0;z-index:2;background:var(--red);color:#fff;padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;display:flex;align-items:center;justify-content:space-between}
+.sos-head h2{color:#fff;margin:0;font-family:var(--font);font-size:1.2rem;letter-spacing:.04em}
+.sos-close{border:2px solid #fff;background:transparent;color:#fff;border-radius:12px;min-height:44px;padding:6px 14px;font-weight:700;cursor:pointer}
+.sos-body{max-width:760px;margin:0 auto;padding:16px 16px 40px}
+.call-big{display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;border-radius:16px;text-decoration:none;margin-bottom:10px;
+  background:var(--red);color:#fff;box-shadow:0 4px 12px rgba(192,38,45,.3)}
+.call-big .ico{font-size:1.8rem}
+.call-big b{display:block;font-size:1.15rem}
+.call-big small{display:block;opacity:.92}
+.call-big.alt{background:var(--green)}
+.call-big.alt2{background:var(--blue)}
+.call-big[aria-disabled="true"]{background:var(--disabled);box-shadow:none;pointer-events:none}
+.sos-section{margin:18px 0 8px;font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* =====================================================================
+   7. CONTATOS, CHECKLISTS, PROGRAMAÇÃO
+   ===================================================================== */
+.person{display:flex;gap:12px;align-items:flex-start}
+.avatar{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;background:var(--earth)}
+.person .info{flex:1;min-width:0}
+.person .info strong{display:block}
+.person .info .empty{color:var(--amber);font-style:italic;font-weight:600}
+.progress{height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--green-600));border-radius:99px;transition:width .3s}
+.progress-label{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin:6px 0 4px}
+.checks li{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--surface-3)}
+.checks li:last-child{border-bottom:0}
+.checks label{flex:1;display:flex;align-items:center;gap:12px;min-height:40px;cursor:pointer}
+.checks input[type=checkbox]{width:24px;height:24px;accent-color:var(--green);flex:none}
+.checks .done .t{text-decoration:line-through;color:var(--muted)}
+.checks .t-time{font-weight:800;color:var(--heading);font-size:.86rem;min-width:44px}
+.icon-btn{border:0;background:none;width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:1rem;flex:none}
+.icon-btn:hover{background:var(--surface-2)}
+.add-row{display:flex;gap:8px;margin-top:10px}
+.add-row input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--input-border);border-radius:10px;min-height:44px;background:var(--surface)}
+details.collapsible>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+details.collapsible>summary::-webkit-details-marker{display:none}
+details.collapsible>summary::after{content:"▾";color:var(--muted);transition:transform .2s}
+details.collapsible[open]>summary::after{transform:rotate(180deg)}
+
+.more-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.weather{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.wday{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.wday .wi{font-size:1.8rem}
+.wday b{display:block}
+.total{display:flex;justify-content:space-between;font-weight:800;padding-top:8px;border-top:2px solid var(--line);margin-top:8px}
+
+/* Diálogo de formulário */
+dialog{border:0;border-radius:18px;padding:0;background:var(--surface);color:var(--ink);width:min(560px,94vw);max-height:90vh;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(20,30,25,.55)}
+dialog form{padding:18px}
+dialog h3{font-family:var(--font-display);font-size:1.25rem;color:var(--heading)}
+.dlg-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 92px);transform:translate(-50%,20px);z-index:200;
+  background:var(--toast-bg);color:var(--toast-ink);padding:11px 16px;border-radius:12px;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;
+  transition:all .25s;max-width:92vw;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.error{background:var(--red)}
+.toast.ok{background:var(--ok)}
+.banner{max-width:760px;margin:10px auto 0;padding:10px 14px;border-radius:12px;font-size:.88rem;font-weight:600}
+.banner.warn{background:var(--amber-100);color:var(--amber-ink);border:1px solid var(--line-amber);margin:10px 16px 0}
+
+.print-card{display:none}
+
+/* =====================================================================
+   8. RESPONSIVIDADE (tablet / desktop)
+   ===================================================================== */
+@media (min-width:600px){
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .quick{grid-template-columns:repeat(4,1fr)}
+  .grid-2{grid-template-columns:1fr 1fr}
+  .weather{grid-template-columns:repeat(4,1fr)}
+  .more-grid{grid-template-columns:repeat(3,1fr)}
+  .hero h1{font-size:2.1rem}
+}
+@media (min-width:1000px){
+  body{font-size:17px}
+}
+
+/* =====================================================================
+   9. IMPRESSÃO / PDF
+   ===================================================================== */
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff;padding:0;font-size:11pt}
+  .topbar,.bottom-nav,.sos-fab,.toast,dialog,.sos-overlay,.banner,.no-print,.btn,.btn-row,.icon-btn,.add-row,.leg-tabs,.btn-sos-big,.quick,.pend button{display:none!important}
+  main{max-width:none;padding:0}
+  .view{display:block!important;break-before:page;animation:none}
+  .view:first-of-type{break-before:auto}
+  .card,.tl-body,.stat,.em-card{box-shadow:none;break-inside:avoid}
+  .hero{background:#fff!important;color:var(--ink);border:2px solid var(--green)}
+  .hero::after{display:none}
+  .countdown{display:none}
+  .timeline .leg{display:block!important}
+  details.collapsible{display:block}
+  details.collapsible>*{display:block}
+  .field input,.field textarea{border:1px solid #999;min-height:auto}
+  .timer{display:none}
+  /* Modo "cartão do porta-luvas": imprime somente o cartão */
+  body.print-card-mode main,body.print-card-mode header{display:none!important}
+  body.print-card-mode .print-card{display:block!important}
+}
+/* Layout do cartão impresso */
+.print-card{font-size:10pt;color:#000}
+.pc-frame{border:3px solid #c0262d;border-radius:10px;padding:10px 12px}
+.pc-title{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #c0262d;padding-bottom:6px;margin-bottom:8px}
+.pc-title h1{font-size:15pt;color:#c0262d;margin:0}
+.pc-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pc-box{border:1px solid #bbb;border-radius:6px;padding:6px 8px;margin-bottom:8px;break-inside:avoid}
+.pc-box h2{font-family:var(--font);font-size:10pt;text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px;color:#1d3a2c}
+.pc-box p{margin:0 0 2px}
+.pc-big{font-size:16pt;font-weight:800;color:#c0262d}
+.pc-flag{font-weight:700;color:#a35f00}
+.pc-cut{margin-top:6px;font-size:8pt;color:#555;text-align:center;border-top:1px dashed #999;padding-top:4px}
+.pc-box ol{margin:0;padding-left:16px}
+</style>
+</head>
+<body>
+
+<!-- ===================== TOPO ===================== -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">⛰️</span>
+      <div><strong>Vale da Mantiqueira</strong><small>16 a 19/11/2026</small></div>
+    </div>
+    <div class="top-actions">
+      <span id="saveBadge" class="pill save-badge" aria-live="polite">✓ Salvo</span>
+      <span id="netBadge" class="pill" title="Status da conexão">● Online</span>
+      <button id="themeBtn" class="theme-btn" data-action="theme-cycle" aria-label="Alternar tema">🌓</button>
+    </div>
+  </div>
+</header>
+<div id="storageWarning" class="banner warn" hidden role="alert">
+  ⚠️ Este navegador não está permitindo salvar dados localmente. Suas edições valem apenas enquanto a página estiver aberta.
+  Use <b>Mais → Exportar backup</b> para não perder informações.
+</div>
+
+<!-- ===================== CONTEÚDO (telas) ===================== -->
+<main id="app">
+  <section class="view" id="view-inicio" aria-label="Início"></section>
+  <section class="view" id="view-roteiro" aria-label="Roteiro"></section>
+  <section class="view" id="view-saude" aria-label="Saúde e emergência"></section>
+  <section class="view" id="view-contatos" aria-label="Contatos"></section>
+  <section class="view" id="view-mais" aria-label="Mais"></section>
+  <section class="view" id="view-hotel" aria-label="Hospedagem"></section>
+  <section class="view" id="view-passeios" aria-label="Passeios"></section>
+  <section class="view" id="view-checklist" aria-label="Checklist"></section>
+  <section class="view" id="view-info" aria-label="Informações úteis"></section>
+</main>
+
+<!-- Botão flutuante de emergência (sempre visível) -->
+<button class="sos-fab no-print" id="sosFab" data-action="sos" aria-label="Estou em uma emergência">SOS</button>
+
+<!-- ===================== NAVEGAÇÃO INFERIOR ===================== -->
+<nav class="bottom-nav" aria-label="Navegação principal">
+  <ul>
+    <li><button data-action="go" data-view="inicio"><span class="ico" aria-hidden="true">🏠</span>Início</button></li>
+    <li><button data-action="go" data-view="roteiro"><span class="ico" aria-hidden="true">🗺️</span>Roteiro</button></li>
+    <li><button data-action="go" data-view="saude" class="nav-sos"><span class="ico" aria-hidden="true">❤️‍🩹</span>Saúde</button></li>
+    <li><button data-action="go" data-view="contatos"><span class="ico" aria-hidden="true">👨‍👩‍👧‍👦</span>Contatos</button></li>
+    <li><button data-action="go" data-view="mais"><span class="ico" aria-hidden="true">☰</span>Mais</button></li>
+  </ul>
+</nav>
+
+<!-- Tela de emergência em tela cheia -->
+<div id="sosOverlay" class="sos-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="sosTitle"></div>
+
+<!-- Formulários de edição -->
+<dialog id="formDialog"></dialog>
+
+<!-- Feedback -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- Cartão de emergência para impressão (porta-luvas) -->
+<div id="printCard" class="print-card" aria-hidden="true"></div>
+
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+'use strict';
+/* =====================================================================
+   1. CONFIGURAÇÃO CENTRAL — dados fixos da viagem
+   Itens marcados como "informado" vieram do organizador da viagem ou de
+   fontes públicas; itens "a confirmar" precisam de verificação.
+   ===================================================================== */
+const CONFIG = Object.freeze({
+  storageKey: 'guiaMantiqueira.v1',
+  appId: 'guia-viagem-mantiqueira',
+  schemaVersion: 1,
+  /* Sincronização entre os aparelhos (Supabase REST). Vazio = só local. */
+  sync: { url: 'https://agnikbqxkqafxkekmdnj.supabase.co', key: '', table: 'guia_viagem_dados' },
+  trip: {
+    name: 'Viagem em Família',
+    destination: 'Hotel Fazenda Vale da Mantiqueira',
+    city: 'Virgínia – MG',
+    origin: 'São Pedro da Aldeia – RJ',
+    period: '16/11/2026 a 19/11/2026',
+    group: '6 adultos e 2 crianças',
+    groupDetail: 'Dois casais, cada um com um filho, e dois avós',
+    departureISO: '2026-11-16T06:00:00-03:00',
+    endISO: '2026-11-19T23:59:59-03:00',
+    days: ['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19']
+  },
+  places: {
+    origem: { name: 'São Pedro da Aldeia – RJ', address: 'São Pedro da Aldeia – RJ', query: 'São Pedro da Aldeia, RJ' },
+    graal: {
+      name: 'Graal Resende – RJ',
+      address: 'Rodovia Presidente Dutra, km 305 – Paraíso, Resende – RJ, 27535-015',
+      query: 'Graal Resende, Rodovia Presidente Dutra km 305, Resende - RJ',
+      services: ['🍽️ Alimentação', '🚻 Banheiros', '😌 Descanso'],
+      note: 'Endereço de referência. Use esta parada somente se o GPS confirmar que ela está no trajeto e no sentido da pista em que vocês estiverem.'
+    },
+    hotel: {
+      name: 'Hotel Fazenda Vale da Mantiqueira',
+      address: 'Fazenda Sertãozinho, s/n – Bairro Sertãozinho, Virgínia – MG, 37465-000',
+      query: 'Hotel Fazenda Vale da Mantiqueira, Virgínia - MG',
+      phones: ['(35) 3373-1900', '(35) 2143-0284'],
+      site: 'https://valedamantiqueira.com.br/',
+      note: 'Endereço conforme cadastros públicos do estabelecimento. Para navegar, o nome do hotel costuma funcionar melhor que o endereço.'
+    },
+    flona: { name: 'Floresta Nacional de Passa Quatro', address: 'Estrada do Taboão, s/n – Bairro Tabuão, Passa Quatro – MG, 37460-000', query: 'Floresta Nacional de Passa Quatro, MG' },
+    passaQuatro: { name: 'Centro histórico de Passa Quatro', address: 'Centro – Passa Quatro – MG', query: 'Estação Ferroviária de Passa Quatro, MG' }
+  },
+  hospitals: [
+    {
+      id: 'hospVirginia', role: 'Hospital mais próximo', name: 'Casa de Caridade Santo Antônio', city: 'Virgínia – MG',
+      phone: '(35) 3373-1300', address: 'Praça Dona Maria Varella, 76 – Centro, Virgínia – MG',
+      query: 'Casa de Caridade Santo Antônio, Praça Dona Maria Varella 76, Virgínia - MG',
+      facts: [
+        { label: 'Telefone', value: '(35) 3373-1300', status: 'informado' },
+        { label: 'Endereço', value: 'Praça Dona Maria Varella, 76 – Centro', status: 'informado' },
+        { label: 'Funcionamento', value: '24 horas', status: 'informado' },
+        { label: 'Capacidade pediátrica', value: '', status: 'confirmar' },
+        { label: 'Estrutura p/ emergências neurológicas', value: '', status: 'confirmar' }
+      ]
+    },
+    {
+      id: 'hospSL', role: 'Hospital de referência regional', name: 'Hospital São Lourenço', city: 'São Lourenço – MG',
+      phone: '(35) 3339-2060', address: 'Rua Ida Lage, 310 – Nossa Senhora de Fátima, São Lourenço – MG',
+      query: 'Hospital São Lourenço, Rua Ida Lage 310, São Lourenço - MG',
+      facts: [
+        { label: 'Telefone', value: '(35) 3339-2060', status: 'informado' },
+        { label: 'Endereço', value: 'Rua Ida Lage, 310 – N. Sra. de Fátima', status: 'informado' },
+        { label: 'Emergência', value: '24 horas', status: 'informado' },
+        { label: 'Atendimento pediátrico', value: 'Informado pelo estabelecimento', status: 'informado' },
+        { label: 'Estrutura p/ emergências neurológicas', value: '', status: 'confirmar' }
+      ]
+    }
+  ],
+  usefulPhones: [
+    { label: 'SAMU', phone: '192', ico: '🚑' },
+    { label: 'Corpo de Bombeiros', phone: '193', ico: '🚒' },
+    { label: 'Polícia Militar', phone: '190', ico: '🚓' },
+    { label: 'Polícia Rodoviária Federal', phone: '191', ico: '🛣️' }
+  ],
+  // Coordenadas aproximadas de Virgínia–MG, usadas apenas para a previsão do tempo
+  weather: { lat: -22.33, lon: -45.09, label: 'Virgínia – MG (região aproximada)' },
+  attractions: [
+    {
+      id: 'flona', ico: '🌳', title: 'Floresta Nacional de Passa Quatro', place: 'flona',
+      items: ['Lago', 'Cachoeira do Iporã', 'Viveiro de mudas', 'Museu'],
+      details: [
+        ['Endereço', 'Estrada do Taboão, s/n – Bairro Tabuão, Passa Quatro – MG'],
+        ['Administração', 'ICMBio'],
+        ['Horários de visitação', 'A CONFIRMAR antes da visita'],
+        ['Telefone (fonte não oficial)', '(35) 3371-1356 — confirmar']
+      ],
+      warn: 'Não há confirmação de que a Floresta estará aberta em 17 e 18/11 (terça e quarta). Ligue ou consulte o ICMBio antes de ir.',
+      phone: '(35) 3371-1356'
+    },
+    {
+      id: 'centro', ico: '🚂', title: 'Centro histórico de Passa Quatro', place: 'passaQuatro',
+      items: ['Estação ferroviária', 'Casario histórico', 'Praça central', 'Comércio, cafés e produtos regionais'],
+      details: [['Funcionamento', 'Lojas, cafés e atrações têm horários próprios — A CONFIRMAR']],
+      warn: 'Passeios turísticos de trem e horários do comércio variam por dia da semana; confirme antes.'
+    },
+    {
+      id: 'hotelfun', ico: '🏊', title: 'Lazer no Hotel Fazenda', place: 'hotel',
+      items: ['Piscinas', 'Piscinas aquecidas', 'Toboáguas', 'Playground', 'Passeios e atividades rurais', 'Pedalinho', 'Demais atrações do hotel'],
+      details: [['Horários e regras', 'Consultar na recepção — A CONFIRMAR']],
+      warn: 'Funcionamento de cada atração (ex.: piscina aquecida, toboáguas) pode depender de clima, manutenção e programação do hotel.'
+    }
+  ]
+});
+
+/* =====================================================================
+   2. UTILITÁRIOS REUTILIZÁVEIS
+   ===================================================================== */
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-5);
+const digits = (s) => String(s ?? '').replace(/\D/g, '');
+const isBlank = (s) => !String(s ?? '').trim();
+const nl2br = (s) => esc(s).replace(/\n/g, '<br>');
+
+/** Normaliza telefone brasileiro para formato internacional (sem +) */
+function normPhone(p) {
+  let d = digits(p).replace(/^0+/, '');
+  if (d.length === 10 || d.length === 11) d = '55' + d;
+  return d;
+}
+/** Link tel: — números curtos (192, 193...) ficam como estão */
+function telHref(p) {
+  const d = digits(p);
+  if (!d) return null;
+  if (d.length <= 4) return 'tel:' + d;
+  return 'tel:+' + normPhone(p);
+}
+/** Link do WhatsApp (wa.me) — exige DDD */
+function waHref(p, text) {
+  const d = normPhone(p);
+  if (d.length < 12) return null;
+  return 'https://wa.me/' + d + (text ? '?text=' + encodeURIComponent(text) : '');
+}
+const mapsHref = (q) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+const dirHref = (dest, origin) => 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(dest) +
+  (origin ? '&origin=' + encodeURIComponent(origin) : '') + '&travelmode=driving';
+
+const getPath = (obj, path) => path.split('.').reduce((a, k) => (a == null ? undefined : a[k]), obj);
+function setPath(obj, path, val) {
+  const ks = path.split('.');
+  let a = obj;
+  ks.slice(0, -1).forEach(k => { if (typeof a[k] !== 'object' || a[k] === null) a[k] = {}; a = a[k]; });
+  a[ks[ks.length - 1]] = val;
+}
+const fmtDateTime = (iso) => { try { return new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }); } catch { return iso; } };
+const fmtMoney = (n) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const parseMoney = (s) => { const n = parseFloat(String(s || '').trim().replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+
+/** Botões padronizados */
+function linkBtn({ href, label, cls = '', net = false, newTab = false, ico = '' }) {
+  if (!href) return `<span class="btn ${cls}" aria-disabled="true">${ico} ${esc(label)}</span>`;
+  return `<a class="btn ${cls}${net ? ' needs-net' : ''}" href="${esc(href)}"${newTab ? ' target="_blank" rel="noopener"' : ''}>${ico} ${esc(label)}${net ? ' <span class="net-tag">🌐 internet</span>' : ''}</a>`;
+}
+const callBtn = (phone, label = 'Ligar', cls = 'primary sm') => linkBtn({ href: telHref(phone), label, cls, ico: '📞' });
+const waBtn = (phone, cls = 'sm') => linkBtn({ href: waHref(phone), label: 'WhatsApp', cls, net: true, newTab: true, ico: '💬' });
+const mapBtn = (query, label = 'Abrir no mapa', cls = 'blue sm') => linkBtn({ href: mapsHref(query), label, cls, net: true, newTab: true, ico: '📍' });
+const navBtn = (query, label = 'Navegar', cls = 'sm') => linkBtn({ href: dirHref(query), label, cls, net: true, newTab: true, ico: '🧭' });
+const badge = (status) => status === 'confirmar' ? '<span class="badge conf">A CONFIRMAR</span>'
+  : status === 'ok' ? '<span class="badge ok">CONFIRMADO</span>' : '<span class="badge inf">INFORMADO</span>';
+
+/* =====================================================================
+   3. VALIDAÇÃO DE CAMPOS
+   ===================================================================== */
+const Validators = {
+  text: v => v.length <= 300 || 'Máximo de 300 caracteres.',
+  longtext: v => v.length <= 3000 || 'Máximo de 3000 caracteres.',
+  required: v => !isBlank(v) || 'Campo obrigatório.',
+  phone: v => isBlank(v) || (/^[\d\s()+\-.]{3,22}$/.test(v) && [3, 8, 9, 10, 11, 12, 13].includes(digits(v).length))
+    || 'Telefone inválido. Use DDD + número, ex.: (21) 99999-9999.',
+  age: v => isBlank(v) || (/^\d{1,3}$/.test(v.trim()) && +v <= 120) || 'Informe a idade em anos (somente números).',
+  time: v => v.length <= 25 || 'Máximo de 25 caracteres. Ex.: 06:00 ou 12:30–13:00.',
+  money: v => isBlank(v) || /^\d{1,3}(\.?\d{3})*([.,]\d{1,2})?$/.test(v.trim()) || 'Valor inválido. Ex.: 150,00'
+};
+/** Retorna mensagem de erro ou null */
+function validate(value, rules) {
+  for (const r of String(rules || 'text').split('|').filter(Boolean)) {
+    const fn = Validators[r];
+    if (!fn) continue;
+    const res = fn(String(value ?? ''));
+    if (res !== true) return res;
+  }
+  return null;
+}
+
+/* =====================================================================
+   4. ESTADO E PERSISTÊNCIA (localStorage)
+   ===================================================================== */
+const mkItems = (arr) => arr.map(text => ({ id: uid(), text, done: false }));
+
+function defaultState() {
+  return {
+    meta: { schemaVersion: CONFIG.schemaVersion, updatedAt: null },
+    route: {
+      ida: [
+        { id: 'i1', kind: 'saida', label: 'Saída', title: 'São Pedro da Aldeia – RJ', place: 'origem', time: '06:00', detail: 'Segunda-feira, 16/11. Saída prevista.', notes: '' },
+        { id: 'i2', kind: 'parada', label: 'Parada única (sugerida)', title: 'Graal Resende – RJ', place: 'graal', time: '', stay: '40 a 50 min', detail: '', notes: '' },
+        { id: 'i3', kind: 'chegada', label: 'Chegada prevista', title: 'Hotel Fazenda Vale da Mantiqueira', place: 'hotel', time: '12:30–13:00', detail: 'Áreas comuns a partir das 13h (conforme informado). Check-in às 16h.', notes: '' }
+      ],
+      volta: [
+        { id: 'v1', kind: 'checkout', label: 'Check-out', title: 'Hotel Fazenda Vale da Mantiqueira', place: 'hotel', time: 'até 12:00', detail: 'Quinta-feira, 19/11.', notes: '' },
+        { id: 'v2', kind: 'almoco', label: 'Almoço', title: 'Almoço antes da partida', place: '', time: '', detail: 'Definir local e horário.', notes: '' },
+        { id: 'v3', kind: 'saida', label: 'Saída', title: 'Partida para casa', place: 'hotel', time: '13:00', detail: 'Saída prevista.', notes: '' },
+        { id: 'v4', kind: 'parada', label: 'Parada única (preferencial)', title: 'Graal Resende – RJ', place: 'graal', time: '', stay: '40 a 50 min', detail: '', notes: '' },
+        { id: 'v5', kind: 'chegada', label: 'Chegada estimada', title: 'São Pedro da Aldeia – RJ', place: 'origem', time: '19:30–20:30', detail: '', notes: '' }
+      ]
+    },
+    hotel: { reserva: '', responsavel: '', obs: '' },
+    hotelChecklist: { id: 'hotel', title: 'Checklist de hospedagem', ico: '🧳', items: mkItems(['Documentos', 'Medicamentos', 'Roupas', 'Itens de higiene', 'Carregadores', 'Outros itens pessoais']) },
+    plan: [
+      { id: 'd17', title: 'Terça-feira, 17/11', items: [
+        { id: uid(), time: '', text: 'Conferir horários do medicamento de uso contínuo (conforme ficha médica)', done: false },
+        { id: uid(), time: 'Manhã', text: 'Floresta Nacional de Passa Quatro — lago, Cachoeira do Iporã, viveiro e museu (confirmar funcionamento)', done: false },
+        { id: uid(), time: 'Almoço', text: 'Definir local', done: false },
+        { id: uid(), time: 'Tarde', text: 'Centro histórico de Passa Quatro — estação, casario, praça, cafés e produtos regionais', done: false },
+        { id: uid(), time: 'Fim do dia', text: 'Retorno ao hotel e descanso', done: false }
+      ] },
+      { id: 'd18', title: 'Quarta-feira, 18/11', items: [
+        { id: uid(), time: '', text: 'Conferir horários do medicamento de uso contínuo (conforme ficha médica)', done: false },
+        { id: uid(), time: 'Manhã', text: 'Piscinas e toboáguas do hotel (confirmar horários)', done: false },
+        { id: uid(), time: 'Manhã', text: 'Pedalinho e playground', done: false },
+        { id: uid(), time: 'Tarde', text: 'Passeios e atividades rurais (consultar programação na recepção)', done: false },
+        { id: uid(), time: 'Noite', text: 'Arrumar as malas para o retorno', done: false }
+      ] }
+    ],
+    medical: {
+      childName: '', childAge: '8', respName: '', respPhone: '', meds: '', dosage: '', allergies: '',
+      neuroName: '', neuroPhone: '', emergencyPlan: '', rescueMed: '', insurance: '', insuranceCard: ''
+    },
+    hospitals: { hospVirginia: { confirmed: false, note: '' }, hospSL: { confirmed: false, note: '' } },
+    contacts: Array.from({ length: 8 }, () => ({ id: uid(), name: '', phone: '', relation: '', obs: '' })),
+    families: [
+      { id: uid(), title: 'Família 1', contacts: [] },
+      { id: uid(), title: 'Família 2', contacts: [] }
+    ],
+    checklists: [
+      { id: 'docs', title: 'Documentos', ico: '📄', items: mkItems(['Documentos pessoais', 'Documentos das crianças', 'Cartões do plano de saúde', 'Reserva do hotel', 'Receitas médicas']) },
+      { id: 'saude', title: 'Saúde', ico: '💊', items: mkItems(['Medicamentos de uso contínuo', 'Medicamentos de reserva', 'Medicamento de resgate, se prescrito', 'Termômetro', 'Kit de primeiros socorros']) },
+      { id: 'viagem', title: 'Viagem', ico: '🚗', items: mkItems(['Carregadores', 'Power banks', 'Água', 'Lanches', 'Óculos de sol', 'Protetor solar', 'Repelente']) },
+      { id: 'hosp', title: 'Hospedagem', ico: '🛏️', items: mkItems(['Roupas', 'Roupas de banho', 'Calçados', 'Produtos de higiene pessoal']) }
+    ],
+    info: { fuel: '', tolls: '', expenses: [], notes: '' },
+    seizure: { running: false, start: null },
+    seizureLog: [],
+    weather: null
+  };
+}
+
+/** Mescla dados salvos sobre o modelo padrão (preserva campos novos) */
+function mergeDefaults(def, saved) {
+  if (Array.isArray(def)) return Array.isArray(saved) ? saved : def;
+  if (def && typeof def === 'object') {
+    const out = { ...def };
+    if (saved && typeof saved === 'object' && !Array.isArray(saved)) {
+      for (const k of Object.keys(saved)) out[k] = k in def ? mergeDefaults(def[k], saved[k]) : saved[k];
+    }
+    return out;
+  }
+  return saved === undefined ? def : saved;
+}
+
+const Store = {
+  available: (() => { try { const k = '__t'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return true; } catch { return false; } })(),
+  load() {
+    const def = defaultState();
+    if (!this.available) return def;
+    try {
+      const raw = localStorage.getItem(CONFIG.storageKey);
+      return raw ? mergeDefaults(def, JSON.parse(raw)) : def;
+    } catch (e) {
+      console.error('Falha ao ler dados salvos', e);
+      setTimeout(() => toast('Não foi possível ler os dados salvos. Usando dados iniciais.', 'error'), 600);
+      return def;
+    }
+  },
+  save(state) {
+    if (!this.available) return false;
+    try {
+      state.meta.updatedAt = new Date().toISOString();
+      localStorage.setItem(CONFIG.storageKey, JSON.stringify(state));
+      return true;
+    } catch (e) {
+      console.error('Falha ao salvar', e);
+      toast('Erro ao salvar (armazenamento cheio ou bloqueado).', 'error');
+      return false;
+    }
+  }
+};
+
+let S = Store.load();
+
+/** Salva e mostra feedback discreto */
+function commit(message, type = 'ok') {
+  const ok = Store.save(S);
+  const b = $('#saveBadge');
+  if (b && ok) { b.classList.add('show'); clearTimeout(commit._t); commit._t = setTimeout(() => b.classList.remove('show'), 1400); }
+  if (message) toast(message, type);
+  renderDerived();
+  Sync.touch();
+}
+const commitDebounced = debounce(() => commit(), 400);
+
+/* =====================================================================
+   4b. SINCRONIZAÇÃO ENTRE APARELHOS
+   Compartilhado: roteiro, hotel, programação, hospitais, contatos,
+   famílias e despesas. Ficha médica, registro de crises e checklists
+   NÃO são enviados: ficam apenas neste aparelho.
+   Offline: alterações ficam marcadas como pendentes e sobem quando a
+   conexão voltar. Conflito: vale a última gravação de cada seção.
+   ===================================================================== */
+const Sync = {
+  keys: ['route', 'hotel', 'plan', 'hospitals', 'contacts', 'families', 'info'],
+  baseKey: 'guiaMantiqueira.syncBase', dirtyKey: 'guiaMantiqueira.syncDirty',
+  base: {}, dirty: {}, busy: false, pendingRender: false, lastOk: null,
+  enabled() { return !!(CONFIG.sync.url && CONFIG.sync.key) && Store.available; },
+  init() {
+    if (!this.enabled()) return;
+    try {
+      this.base = JSON.parse(localStorage.getItem(this.baseKey) || '{}');
+      this.dirty = JSON.parse(localStorage.getItem(this.dirtyKey) || '{}');
+    } catch { this.base = {}; this.dirty = {}; }
+    this.rebase(false);
+    window.addEventListener('online', () => this.run());
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) this.run(); });
+    document.addEventListener('focusout', () => setTimeout(() => this.flushRender(), 300));
+    setInterval(() => this.run(), 30000);
+    this.run();
+  },
+  /** Define o estado atual como referência (sem marcar nada como pendente) */
+  rebase(force) {
+    for (const k of this.keys) if (force || this.base[k] === undefined) { this.base[k] = JSON.stringify(S[k]); if (force) delete this.dirty[k]; }
+    this.persist();
+  },
+  persist() {
+    try {
+      localStorage.setItem(this.baseKey, JSON.stringify(this.base));
+      localStorage.setItem(this.dirtyKey, JSON.stringify(this.dirty));
+    } catch { /* sem armazenamento */ }
+  },
+  /** Chamado a cada commit: detecta seções compartilhadas alteradas */
+  touch() {
+    if (!this.enabled()) return;
+    let any = false;
+    for (const k of this.keys) if (JSON.stringify(S[k]) !== this.base[k]) { this.dirty[k] = true; any = true; }
+    if (any) { this.persist(); this.runSoon(); }
+  },
+  async api(query, opts = {}) {
+    const r = await fetch(`${CONFIG.sync.url}/rest/v1/${CONFIG.sync.table}${query}`, {
+      ...opts,
+      headers: { apikey: CONFIG.sync.key, Authorization: 'Bearer ' + CONFIG.sync.key, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    });
+    if (!r.ok) throw new Error('sync HTTP ' + r.status);
+    return opts.method ? null : r.json();
+  },
+  async run() {
+    if (!this.enabled() || this.busy || !navigator.onLine) return;
+    this.busy = true;
+    try {
+      // 1) Baixa o que os outros alteraram (exceto seções com alteração local pendente)
+      const rows = await this.api('?select=chave,valor');
+      const def = defaultState();
+      let changed = false;
+      for (const r of rows) {
+        const k = r.chave;
+        if (!this.keys.includes(k) || this.dirty[k] || r.valor == null || Array.isArray(r.valor) !== Array.isArray(def[k])) continue;
+        if (JSON.stringify(r.valor) !== JSON.stringify(S[k])) { S[k] = mergeDefaults(def[k], r.valor); changed = true; }
+        this.base[k] = JSON.stringify(S[k]);
+      }
+      // 2) Envia as alterações locais pendentes
+      const d = this.keys.filter(k => this.dirty[k]);
+      if (d.length) {
+        const snap = Object.fromEntries(d.map(k => [k, JSON.stringify(S[k])]));
+        const now = new Date().toISOString();
+        await this.api('?on_conflict=chave', {
+          method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify(d.map(k => ({ chave: k, valor: S[k], atualizado_em: now })))
+        });
+        for (const k of d) { this.base[k] = snap[k]; if (JSON.stringify(S[k]) === snap[k]) delete this.dirty[k]; }
+      }
+      this.persist();
+      this.lastOk = new Date().toISOString();
+      if (changed) { Store.save(S); this.pendingRender = true; this.flushRender(); }
+    } catch (e) {
+      console.warn('Sincronização falhou (tentará de novo):', e.message);
+    } finally { this.busy = false; }
+  },
+  /** Redesenha a tela só quando o usuário não está digitando/editando */
+  flushRender() {
+    if (!this.pendingRender) return;
+    const a = document.activeElement;
+    if ($('#formDialog')?.open || (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) return;
+    this.pendingRender = false;
+    renderAll();
+  },
+  status() {
+    if (!this.enabled()) return '<span class="badge conf">DESATIVADA</span>';
+    const n = Object.keys(this.dirty).length;
+    return (n ? `<span class="badge conf">${n} ALTERAÇÃO(ÕES) AGUARDANDO INTERNET</span>` : '<span class="badge ok">EM DIA</span>') +
+      (this.lastOk ? ` · última sincronização ${esc(fmtDateTime(this.lastOk))}` : '');
+  }
+};
+Sync.runSoon = debounce(() => Sync.run(), 800);
+
+/* =====================================================================
+   5. FEEDBACK VISUAL (toast) E CONEXÃO
+   ===================================================================== */
+function toast(msg, type = '') {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => (t.className = 'toast ' + type), 2600);
+}
+function updateNet() {
+  const b = $('#netBadge');
+  const on = navigator.onLine;
+  b.textContent = on ? '● Online' : '● Offline';
+  b.classList.toggle('offline', !on);
+}
+
+/* =====================================================================
+   5b. TEMA CLARO / ESCURO
+   ===================================================================== */
+const Theme = {
+  key: 'guiaMantiqueira.theme',
+  labels: { auto: 'Automático', light: 'Claro', dark: 'Escuro' },
+  icons: { auto: '🌓', light: '☀️', dark: '🌙' },
+  mq: window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null,
+  pref() { return document.documentElement.getAttribute('data-theme-pref') || 'auto'; },
+  resolved(pref = this.pref()) { return pref === 'dark' || (pref === 'auto' && this.mq?.matches) ? 'dark' : 'light'; },
+  /** Aplica o tema efetivo e atualiza a barra do navegador e os botões */
+  apply(pref = this.pref()) {
+    const root = document.documentElement;
+    root.setAttribute('data-theme-pref', pref);
+    root.setAttribute('data-theme', this.resolved(pref));
+    const meta = $('meta[name="theme-color"]');
+    if (meta) meta.content = this.resolved(pref) === 'dark' ? '#0b120f' : '#2f5d46';
+    const btn = $('#themeBtn');
+    if (btn) { btn.textContent = this.icons[pref]; btn.setAttribute('aria-label', 'Tema: ' + this.labels[pref] + ' (toque para alternar)'); }
+    $$('[data-action="theme-set"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === pref)));
+  },
+  set(pref) {
+    if (!this.labels[pref]) return;
+    try { localStorage.setItem(this.key, pref); } catch { /* sem armazenamento: vale só nesta sessão */ }
+    this.apply(pref);
+    toast('Tema: ' + this.labels[pref]);
+  },
+  cycle() { const order = ['auto', 'light', 'dark']; this.set(order[(order.indexOf(this.pref()) + 1) % 3]); }
+};
+// Acompanha a troca de modo do sistema quando em "Automático"
+Theme.mq?.addEventListener?.('change', () => { if (Theme.pref() === 'auto') Theme.apply(); });
+// Impressão/PDF sempre em tema claro (economiza tinta e garante legibilidade)
+window.addEventListener('beforeprint', () => document.documentElement.setAttribute('data-theme', 'light'));
+window.addEventListener('afterprint', () => Theme.apply());
+
+/* =====================================================================
+   6. ROTEAMENTO ENTRE TELAS
+   ===================================================================== */
+const VIEWS = ['inicio', 'roteiro', 'saude', 'contatos', 'mais', 'hotel', 'passeios', 'checklist', 'info'];
+const NAV_PARENT = { hotel: 'mais', passeios: 'mais', checklist: 'mais', info: 'mais' };
+
+function go(view, { push = true } = {}) {
+  if (!VIEWS.includes(view)) view = 'inicio';
+  $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
+  const navKey = NAV_PARENT[view] || view;
+  $$('.bottom-nav button').forEach(b => b.toggleAttribute('aria-current', false));
+  const nb = $(`.bottom-nav button[data-view="${navKey}"]`);
+  if (nb) nb.setAttribute('aria-current', 'page');
+  // Histórico (botão "voltar" do Android). Em visualizadores embutidos (iframe/srcdoc)
+  // o navegador bloqueia pushState — nesse caso a navegação segue funcionando sem histórico.
+  if (push && HISTORY_OK && location.hash !== '#' + view) {
+    try { history.pushState(null, '', '#' + view); } catch { HISTORY_OK = false; }
+  }
+  try { window.scrollTo(0, 0); } catch { /* ignora */ }
+}
+/** Só usa o histórico quando a página foi aberta como arquivo/site normal */
+let HISTORY_OK = (() => {
+  try { return location.protocol !== 'about:' && window.self === window.top; }
+  catch { return false; }
+})();
+window.addEventListener('popstate', () => go(location.hash.slice(1), { push: false }));
+
+/* =====================================================================
+   7. TELA INICIAL
+   ===================================================================== */
+function stepByKind(leg, kind) { return S.route[leg].find(s => s.kind === kind) || {}; }
+
+function renderHome() {
+  const T = CONFIG.trip;
+  const dep = stepByKind('ida', 'saida'), arr = stepByKind('ida', 'chegada');
+  const ret = stepByKind('volta', 'saida'), retArr = stepByKind('volta', 'chegada');
+  $('#view-inicio').innerHTML = `
+    <div class="hero">
+      <div class="kicker">Guia da viagem</div>
+      <h1>${esc(T.name)} · Vale da Mantiqueira</h1>
+      <p>🏨 ${esc(T.destination)}</p>
+      <p>📍 ${esc(T.city)} &nbsp;·&nbsp; 📅 ${esc(T.period)}</p>
+      <p class="small">👨‍👩‍👧‍👦 ${esc(T.group)} — ${esc(T.groupDetail)}</p>
+      <div class="countdown" id="countdown" aria-live="polite"></div>
+    </div>
+
+    <button class="btn-sos-big" data-action="sos">🚨 Estou em uma emergência</button>
+
+    <div class="stats">
+      <div class="stat"><span class="ico">🚗</span><div><small>Saída · Seg 16/11</small><strong>${esc(dep.time || 'a definir')}</strong><small>${esc(T.origin)}</small></div></div>
+      <div class="stat"><span class="ico">🏁</span><div><small>Chegada prevista</small><strong>${esc(arr.time || 'a definir')}</strong><small>Check-in às 16h</small></div></div>
+      <div class="stat"><span class="ico">↩️</span><div><small>Retorno · Qui 19/11</small><strong>Saída ${esc(ret.time || 'a definir')}</strong><small>Chegada est. ${esc(retArr.time || 'a definir')}</small></div></div>
+    </div>
+
+    <div class="quick">
+      <button class="q" data-action="go" data-view="roteiro"><span class="ico">🗺️</span>Roteiro<small>Ida e volta</small></button>
+      <a class="q needs-net" href="${esc(dirHref(CONFIG.places.hotel.query))}" target="_blank" rel="noopener"><span class="ico">🧭</span>Mapa<small>Navegar ao hotel · 🌐</small></a>
+      <button class="q" data-action="go" data-view="contatos"><span class="ico">📇</span>Contatos<small>Viajantes e famílias</small></button>
+      <button class="q em" data-action="go" data-view="saude"><span class="ico">❤️‍🩹</span>Emergência<small>Hospitais e ficha médica</small></button>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>📋</span><h3>Pendências antes de viajar</h3></div>
+      <ul class="list-plain pend" id="pendList"></ul>
+    </div>
+    <p class="muted small">⏱️ Todos os horários são estimativas. Distâncias, tempos de percurso e trânsito devem ser verificados no GPS no dia.</p>`;
+  renderPendencies();
+  updateCountdown();
+}
+
+function updateCountdown() {
+  const el = $('#countdown');
+  if (!el) return;
+  const now = new Date(), dep = new Date(CONFIG.trip.departureISO), end = new Date(CONFIG.trip.endISO);
+  if (now < dep) {
+    const ms = dep - now;
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
+    el.innerHTML = `<div class="cd"><b>${d}</b><span>dias</span></div><div class="cd"><b>${h}</b><span>horas</span></div>
+      <div class="cd"><b>${m}</b><span>min</span></div><div class="cd"><b>🚗</b><span>p/ saída</span></div>`;
+  } else if (now <= end) {
+    const day = Math.min(4, Math.floor((now - new Date('2026-11-16T00:00:00-03:00')) / 864e5) + 1);
+    el.innerHTML = `<div class="cd-msg">🌄 Viagem em andamento — dia ${day} de 4. Boa viagem!</div>`;
+  } else {
+    el.innerHTML = `<div class="cd-msg">🏡 Viagem concluída. Esperamos que tenha sido inesquecível!</div>`;
+  }
+}
+
+/** Lista o que ainda falta preencher/confirmar */
+function renderPendencies() {
+  const ul = $('#pendList');
+  if (!ul) return;
+  const M = S.medical;
+  const medKeys = ['childName', 'respPhone', 'meds', 'dosage', 'neuroPhone', 'emergencyPlan'];
+  const medMissing = medKeys.filter(k => isBlank(M[k])).length;
+  const hospPending = CONFIG.hospitals.filter(h => !S.hospitals[h.id]?.confirmed).length;
+  const contactsFilled = S.contacts.filter(c => !isBlank(c.name) && !isBlank(c.phone)).length;
+  const famFilled = S.families.reduce((n, f) => n + f.contacts.length, 0);
+  const all = S.checklists.flatMap(c => c.items);
+  const pct = all.length ? Math.round(all.filter(i => i.done).length / all.length * 100) : 0;
+  const rows = [
+    [hospPending === 0, hospPending ? `Confirmar ${hospPending} hospital(is): pediatria e emergência neurológica` : 'Hospitais confirmados', 'saude'],
+    [medMissing === 0, medMissing ? `Ficha médica: ${medMissing} campo(s) essencial(is) vazio(s)` : 'Ficha médica preenchida', 'saude'],
+    [contactsFilled >= 8, `Contatos dos viajantes: ${contactsFilled} de 8 preenchidos`, 'contatos'],
+    [famFilled > 0, famFilled ? `${famFilled} contato(s) de emergência das famílias` : 'Cadastrar contatos de emergência das famílias', 'contatos'],
+    [!isBlank(S.hotel.reserva), isBlank(S.hotel.reserva) ? 'Informar número da reserva do hotel' : 'Reserva do hotel registrada', 'hotel'],
+    [pct === 100, `Checklist geral: ${pct}% concluído`, 'checklist']
+  ];
+  ul.innerHTML = rows.map(([ok, txt, view]) => `<li><span class="dot ${ok ? 'ok' : ''}"></span><span class="txt">${esc(txt)}</span>
+    <button data-action="go" data-view="${view}">Abrir ›</button></li>`).join('');
+}
+
+/* =====================================================================
+   8. ROTEIRO (linha do tempo editável)
+   ===================================================================== */
+let currentLeg = 'ida';
+function renderRoute() {
+  const leg = S.route[currentLeg];
+  const O = CONFIG.places;
+  const items = leg.map(s => {
+    const P = s.place ? O[s.place] : null;
+    const cls = s.kind === 'parada' ? 'stop' : s.kind === 'chegada' ? 'arrive' : '';
+    return `<li class="tl ${cls}">
+      <div class="tl-time">${esc(s.time || '—')}</div>
+      <div class="tl-body">
+        <div class="tl-label">${esc(s.label)}</div>
+        <h3>${esc(s.title)}</h3>
+        ${P ? `<div class="addr">📍 ${esc(P.address)}</div>` : ''}
+        ${s.stay ? `<div>⏱️ Permanência prevista: <b>${esc(s.stay)}</b></div>` : ''}
+        ${s.kind === 'parada' && P?.services ? `<div class="chips">${P.services.map(x => `<span class="chip">${x}</span>`).join('')}</div>
+          <div class="small muted">${esc(P.note)}</div>` : ''}
+        ${s.detail ? `<div class="small">${esc(s.detail)}</div>` : ''}
+        ${s.kind === 'parada' && isBlank(s.time) ? '<div class="small muted">Horário da parada: definir conforme o GPS no dia.</div>' : ''}
+        ${s.notes ? `<div class="note">📝 ${esc(s.notes)}</div>` : ''}
+        <div class="btn-row">
+          ${P ? mapBtn(P.query) + navBtn(P.query) : ''}
+          <button class="btn sm" data-action="edit-step" data-id="${s.id}">✏️ Editar</button>
+        </div>
+      </div></li>`;
+  }).join('');
+  const from = currentLeg === 'ida' ? O.origem.query : O.hotel.query;
+  const to = currentLeg === 'ida' ? O.hotel.query : O.origem.query;
+  $('#view-roteiro').innerHTML = `
+    <div class="view-head"><div><h2>Roteiro</h2><p class="muted small">Uma única parada em cada trecho. Toque em ✏️ para ajustar horários e incluir observações.</p></div></div>
+    <div class="leg-tabs" role="tablist">
+      <button role="tab" aria-selected="${currentLeg === 'ida'}" data-action="leg" data-leg="ida">➡️ Ida · 16/11</button>
+      <button role="tab" aria-selected="${currentLeg === 'volta'}" data-action="leg" data-leg="volta">⬅️ Volta · 19/11</button>
+    </div>
+    <ol class="timeline">${items}</ol>
+    <div class="card tint-blue">
+      <div class="card-title"><span>🧭</span><h3>Rota completa no GPS</h3></div>
+      <p class="small">Abre a rota de ${currentLeg === 'ida' ? 'São Pedro da Aldeia até o hotel' : 'volta do hotel até São Pedro da Aldeia'} sem paradas adicionadas. Verifique no app se o Graal Resende está no trajeto antes de planejar a parada.</p>
+      ${linkBtn({ href: dirHref(to, from), label: 'Abrir rota no Google Maps', cls: 'blue block', net: true, newTab: true, ico: '🗺️' })}
+    </div>
+    <p class="muted small">⏱️ Horários são estimativas. Este guia não informa distâncias, tempos de percurso ou condições de trânsito — consulte o GPS.</p>`;
+}
+
+function editStep(id) {
+  const s = S.route[currentLeg].find(x => x.id === id);
+  if (!s) return toast('Etapa não encontrada.', 'error');
+  const fields = [
+    { key: 'time', label: 'Horário', rules: 'time', value: s.time, placeholder: 'Ex.: 06:00 ou 12:30–13:00' }
+  ];
+  if ('stay' in s) fields.push({ key: 'stay', label: 'Tempo de permanência', rules: 'text', value: s.stay });
+  if (s.kind === 'almoco') fields.push({ key: 'title', label: 'Local do almoço', rules: 'text', value: s.title });
+  fields.push({ key: 'notes', label: 'Observações', type: 'textarea', rules: 'longtext', value: s.notes });
+  openForm({
+    title: `Editar: ${s.label}`, fields,
+    onSave: v => { Object.assign(s, v); commit('Etapa atualizada'); renderRoute(); renderHome(); }
+  });
+}
+
+/* =====================================================================
+   9. HOSPEDAGEM
+   ===================================================================== */
+function renderHotel() {
+  const H = CONFIG.places.hotel;
+  $('#view-hotel').innerHTML = `
+    <div class="view-head"><div><h2>Hospedagem</h2><p class="muted small">${esc(H.name)}</p></div>
+      <button class="btn sm ghost" data-action="go" data-view="mais">‹ Voltar</button></div>
+    <div class="card tint-green">
+      <div class="card-title"><span>🏨</span><h3>${esc(H.name)}</h3></div>
+      <dl class="kv">
+        <dt>Check-in</dt><dd>16h</dd>
+        <dt>Check-out</dt><dd>até 12h</dd>
+        <dt>Áreas comuns</dt><dd>a partir das 13h <span class="badge inf">INFORMADO</span></dd>
+        <dt>Endereço</dt><dd>${esc(H.address)}</dd>
+        <dt>Telefones</dt><dd>${H.phones.map(esc).join('<br>')}</dd>
+        <dt>Site</dt><dd><a href="${esc(H.site)}" target="_blank" rel="noopener">valedamantiqueira.com.br</a></dd>
+      </dl>
+      <p class="small muted" style="margin-top:8px">${esc(H.note)}</p>
+      <div class="btn-row">
+        ${callBtn(H.phones[0], 'Ligar ' + H.phones[0])}
+        ${callBtn(H.phones[1], 'Ligar ' + H.phones[1], 'sm')}
+      </div>
+      <div class="btn-row">
+        ${linkBtn({ href: H.site, label: 'Abrir site', cls: 'sm', net: true, newTab: true, ico: '🌐' })}
+        ${navBtn(H.query, 'Navegar até o hotel', 'blue sm')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🧾</span><h3>Dados da reserva</h3></div>
+      ${field({ bind: 'hotel.reserva', label: 'Número da reserva', rules: 'text', placeholder: 'Ex.: 123456' })}
+      ${field({ bind: 'hotel.responsavel', label: 'Responsável pela reserva', rules: 'text' })}
+      ${field({ bind: 'hotel.obs', label: 'Observações', type: 'textarea', rules: 'longtext', placeholder: 'Ex.: regime de pensão, tipo de quarto, pedidos especiais...' })}
+    </div>
+
+    <div class="card" id="hotelChecklistCard"></div>`;
+  renderChecklistCard($('#hotelChecklistCard'), S.hotelChecklist);
+}
+
+/* =====================================================================
+   10. PASSEIOS E PROGRAMAÇÃO
+   ===================================================================== */
+function renderPasseios() {
+  const attr = CONFIG.attractions.map(a => {
+    const P = CONFIG.places[a.place];
+    return `<div class="card">
+      <div class="card-title"><span>${a.ico}</span><h3>${esc(a.title)}</h3></div>
+      <div class="chips">${a.items.map(i => `<span class="chip">${esc(i)}</span>`).join('')}</div>
+      <dl class="kv">${a.details.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v).replace('A CONFIRMAR', '<span class="badge conf">A CONFIRMAR</span>')}</dd>`).join('')}</dl>
+      <div class="alert amber small" style="margin:10px 0 0"><span class="ico">⚠️</span><span>${esc(a.warn)}</span></div>
+      <div class="btn-row">${mapBtn(P.query)}${navBtn(P.query)}${a.phone ? callBtn(a.phone, 'Ligar', 'sm') : ''}</div>
+    </div>`;
+  }).join('');
+
+  const days = S.plan.map(d => {
+    const done = d.items.filter(i => i.done).length;
+    return `<div class="card">
+      <div class="card-title" style="justify-content:space-between"><h3>📅 ${esc(d.title)}</h3><span class="badge ok">${done}/${d.items.length}</span></div>
+      <ul class="list-plain checks">${d.items.map(i => `
+        <li class="${i.done ? 'done' : ''}">
+          <label><input type="checkbox" data-change="plan" data-day="${d.id}" data-id="${i.id}" ${i.done ? 'checked' : ''}>
+            ${i.time ? `<span class="t-time">${esc(i.time)}</span>` : ''}<span class="t">${esc(i.text)}</span></label>
+          <button class="icon-btn" data-action="edit-plan" data-day="${d.id}" data-id="${i.id}" aria-label="Editar">✏️</button>
+          <button class="icon-btn" data-action="del-plan" data-day="${d.id}" data-id="${i.id}" aria-label="Excluir">🗑️</button>
+        </li>`).join('') || '<li class="muted small">Nenhuma atividade.</li>'}
+      </ul>
+      <div class="btn-row"><button class="btn sm" data-action="add-plan" data-day="${d.id}">＋ Adicionar atividade</button></div>
+    </div>`;
+  }).join('');
+
+  $('#view-passeios').innerHTML = `
+    <div class="view-head"><div><h2>Passeios</h2><p class="muted small">Sugestões próximas. Nada aqui garante funcionamento — confirme antes.</p></div>
+      <button class="btn sm ghost" data-action="go" data-view="mais">‹ Voltar</button></div>
+    <h3 style="margin:6px 0 10px">Programação sugerida</h3>
+    ${days}
+    <h3 style="margin:18px 0 10px">Atrações</h3>
+    ${attr}`;
+}
+
+function editPlan(dayId, itemId) {
+  const day = S.plan.find(d => d.id === dayId);
+  if (!day) return;
+  const it = itemId ? day.items.find(i => i.id === itemId) : null;
+  openForm({
+    title: it ? 'Editar atividade' : `Nova atividade — ${day.title}`,
+    fields: [
+      { key: 'time', label: 'Horário / período', rules: 'time', value: it?.time || '', placeholder: 'Ex.: 10:00 ou Manhã' },
+      { key: 'text', label: 'Atividade', rules: 'required|text', value: it?.text || '' }
+    ],
+    onSave: v => {
+      if (it) Object.assign(it, v); else day.items.push({ id: uid(), done: false, ...v });
+      commit(it ? 'Atividade atualizada' : 'Atividade adicionada'); renderPasseios();
+    }
+  });
+}
+
+/* =====================================================================
+   11. SAÚDE E EMERGÊNCIA
+   ===================================================================== */
+const MED_FIELDS = [
+  { key: 'childName', label: 'Nome da criança', rules: 'text' },
+  { key: 'childAge', label: 'Idade (anos)', rules: 'age', inputmode: 'numeric' },
+  { key: 'respName', label: 'Nome do responsável', rules: 'text' },
+  { key: 'respPhone', label: 'Telefone do responsável', rules: 'phone', type: 'tel', placeholder: '(21) 99999-9999' },
+  { key: 'meds', label: 'Medicamentos utilizados', type: 'textarea', rules: 'longtext', hint: 'Copie exatamente da receita.' },
+  { key: 'dosage', label: 'Dosagem e horários', type: 'textarea', rules: 'longtext', hint: 'Conforme prescrição médica.' },
+  { key: 'allergies', label: 'Alergias', type: 'textarea', rules: 'longtext', placeholder: 'Ex.: nenhuma conhecida' },
+  { key: 'neuroName', label: 'Nome do neurologista', rules: 'text' },
+  { key: 'neuroPhone', label: 'Telefone do neurologista', rules: 'phone', type: 'tel' },
+  { key: 'emergencyPlan', label: 'Plano de emergência prescrito', type: 'textarea', rules: 'longtext', hint: 'Transcreva o plano individual fornecido pelo neurologista.' },
+  { key: 'rescueMed', label: 'Medicamento de resgate, se houver', type: 'textarea', rules: 'longtext', hint: 'Nome, dose e forma de uso SOMENTE conforme prescrição.' },
+  { key: 'insurance', label: 'Convênio médico', rules: 'text' },
+  { key: 'insuranceCard', label: 'Número da carteirinha', rules: 'text' }
+];
+const PROTOCOL = [
+  'Marcar o horário de início da crise.',
+  'Afastar objetos que possam causar ferimentos.',
+  'Proteger a cabeça.',
+  'Colocar a criança de lado, quando possível e seguro.',
+  'Não restringir os movimentos.',
+  'Não colocar objetos, dedos, água ou medicamentos na boca.',
+  'Acionar emergência (SAMU 192) se a crise durar 5 minutos ou mais, houver crises repetidas sem recuperação, dificuldade respiratória ou outro sinal de gravidade.'
+];
+const protocolHtml = () => `<ol class="protocol">${PROTOCOL.map((p, i) => `<li class="${i === 6 ? 'crit' : ''}">${esc(p)}</li>`).join('')}</ol>`;
+const neuroWarning = () => `<div class="alert red"><span class="ico">🩺</span><span>Siga sempre o plano individual de emergência fornecido pelo neurologista. Estas instruções são apenas cuidados gerais e não substituem a orientação médica.</span></div>`;
+
+const medVal = (k) => isBlank(S.medical[k]) ? '<span class="missing">não preenchido</span>' : nl2br(S.medical[k]);
+
+/** Cartão de emergência resumido — usado na tela Saúde e no modo SOS (funciona offline) */
+function emergencyCardHtml() {
+  const M = S.medical;
+  return `<div class="em-card">
+    <header><h3>🆘 CARTÃO DE EMERGÊNCIA</h3><span class="small">funciona offline</span></header>
+    <div class="em-body">
+      <dl class="kv">
+        <dt>Criança</dt><dd>${medVal('childName')}${M.childAge ? ` · ${esc(M.childAge)} anos` : ''}</dd>
+        <dt>Condição</dt><dd>Histórico de convulsões · uso contínuo de anticonvulsionante</dd>
+        <dt>Medicamentos</dt><dd>${medVal('meds')}</dd>
+        <dt>Dose/horários</dt><dd>${medVal('dosage')}</dd>
+        <dt>Alergias</dt><dd>${medVal('allergies')}</dd>
+        <dt>Resgate</dt><dd>${medVal('rescueMed')}</dd>
+        <dt>Plano médico</dt><dd>${medVal('emergencyPlan')}</dd>
+        <dt>Responsável</dt><dd>${medVal('respName')}${M.respPhone ? `<br>${esc(M.respPhone)}` : ''}</dd>
+        <dt>Neurologista</dt><dd>${medVal('neuroName')}${M.neuroPhone ? `<br>${esc(M.neuroPhone)}` : ''}</dd>
+        <dt>Convênio</dt><dd>${medVal('insurance')}${M.insuranceCard ? ` · nº ${esc(M.insuranceCard)}` : ''}</dd>
+      </dl>
+      <div class="btn-row">
+        ${callBtn('192', 'SAMU 192', 'red sm')}
+        ${M.respPhone ? callBtn(M.respPhone, 'Responsável', 'sm') : ''}
+        ${M.neuroPhone ? callBtn(M.neuroPhone, 'Neurologista', 'sm') : ''}
+      </div>
+    </div></div>`;
+}
+
+function hospitalCardHtml(h, compact = false) {
+  const st = S.hospitals[h.id] || {};
+  return `<div class="card ${h.id === 'hospVirginia' ? 'danger' : ''}">
+    <div class="small muted" style="font-weight:800;letter-spacing:.06em;text-transform:uppercase">${esc(h.role)}</div>
+    <h3 style="margin:2px 0">${esc(h.name)}</h3>
+    <div class="small muted" style="margin-bottom:6px">${esc(h.city)} ${st.confirmed ? badge('ok') : ''}</div>
+    ${compact ? `<div class="small">📍 ${esc(h.address)}</div>` : h.facts.map(f => `<div class="hosp-fact"><span>${esc(f.label)}</span>
+      <span class="v">${f.value ? esc(f.value) + ' ' : ''}${badge(f.status)}</span></div>`).join('')}
+    ${st.note ? `<div class="note">📝 ${esc(st.note)}</div>` : ''}
+    <div class="btn-row">${callBtn(h.phone, 'Ligar ' + h.phone, 'red sm')}${mapBtn(h.query, 'Mapa')}${navBtn(h.query)}</div>
+    ${compact ? '' : `
+    <label class="check-row"><input type="checkbox" data-change="hosp-confirm" data-id="${h.id}" ${st.confirmed ? 'checked' : ''}>
+      <span class="small"><b>Confirmei por telefone</b> o atendimento pediátrico e de emergência neurológica.</span></label>
+    <div class="field" style="margin-top:8px"><label for="hn-${h.id}">Anotações da confirmação</label>
+      <input id="hn-${h.id}" data-bind="hospitals.${h.id}.note" data-rules="text" value="${esc(st.note)}" placeholder="Ex.: falei com ..., em 12/11, informaram que..."></div>`}
+  </div>`;
+}
+
+function seizureTimerHtml() {
+  return `<div class="timer" data-seizure="box">
+    <div class="since" data-seizure="since">Cronômetro de crise</div>
+    <div class="clock" data-seizure="clock">00:00</div>
+    <div class="since" data-seizure="msg">Toque em iniciar quando a crise começar.</div>
+    <div class="btn-row" style="justify-content:center">
+      <button class="btn primary" data-action="seizure-start" data-seizure="startBtn">▶️ Iniciar</button>
+      <button class="btn red" data-action="seizure-stop" data-seizure="stopBtn">⏹️ Crise terminou</button>
+    </div></div>`;
+}
+
+function renderSaude() {
+  const log = S.seizureLog.slice().reverse().slice(0, 10);
+  $('#view-saude').innerHTML = `
+    <div class="view-head"><div><h2>Saúde e emergência</h2><p class="muted small">Seção prioritária — disponível sem internet.</p></div></div>
+    <button class="btn-sos-big" data-action="sos">🚨 Estou em uma emergência</button>
+    ${neuroWarning()}
+    <div id="emCardSlot">${emergencyCardHtml()}</div>
+    <div class="btn-row no-print" style="margin:-4px 0 16px">
+      <button class="btn sm" data-action="print-card">🖨️ Imprimir cartão (porta-luvas)</button>
+      <button class="btn sm" data-action="share-emergency">📤 Compartilhar</button>
+    </div>
+
+    <h3>🏥 Hospitais</h3>
+    <div class="alert amber small"><span class="ico">⚠️</span><span>Dados marcados como <b>INFORMADO</b> foram repassados e não foram verificados por este guia. Itens <b>A CONFIRMAR</b> devem ser checados diretamente com os hospitais antes da viagem.</span></div>
+    ${CONFIG.hospitals.map(h => hospitalCardHtml(h)).join('')}
+    <div class="card tint-blue"><div class="card-title"><span>🚑</span><h3>Emergência nacional</h3></div>
+      <div class="btn-row">${callBtn('192', 'SAMU 192', 'red')}${callBtn('193', 'Bombeiros 193', '')}</div></div>
+
+    <div class="card">
+      <div class="card-title"><span>⚡</span><h3>Primeiros cuidados em uma convulsão</h3></div>
+      ${seizureTimerHtml()}
+      ${protocolHtml()}
+    </div>
+    ${neuroWarning()}
+
+    <div class="card">
+      <details class="collapsible" ${S.medical.childName ? '' : 'open'}>
+        <summary><h3 style="margin:0">📝 Ficha médica (editável)</h3></summary>
+        <p class="small muted" style="margin-top:8px">Preencha somente com informações da receita e do médico. Os dados ficam salvos apenas neste aparelho.</p>
+        <div class="grid-2">${MED_FIELDS.map(f => field({ ...f, bind: 'medical.' + f.key })).join('')}</div>
+      </details>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="justify-content:space-between"><h3>🗒️ Registro de crises</h3>
+        ${log.length ? '<button class="btn sm ghost" data-action="clear-seizure-log">Limpar</button>' : ''}</div>
+      <p class="small muted">O cronômetro registra início e duração — informação útil para a equipe médica.</p>
+      <ul class="list-plain log">${log.map(l => `<li><span>${esc(fmtDateTime(l.start))}</span><b>${esc(l.duration)}</b></li>`).join('') || '<li class="muted">Nenhum registro.</li>'}</ul>
+    </div>`;
+  updateSeizureUI();
+}
+
+/* ---------- Cronômetro de crise ---------- */
+let seizureInterval = null;
+function seizureStart() {
+  if (S.seizure.running) return;
+  S.seizure = { running: true, start: new Date().toISOString() };
+  commit();
+  toast('Cronômetro iniciado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+  startSeizureTick();
+}
+function seizureStop() {
+  if (!S.seizure.running) return toast('O cronômetro não está em andamento.');
+  const secs = Math.round((Date.now() - new Date(S.seizure.start)) / 1000);
+  S.seizureLog.push({ start: S.seizure.start, end: new Date().toISOString(), duration: fmtClock(secs) });
+  S.seizure = { running: false, start: null };
+  commit('Crise registrada: ' + fmtClock(secs));
+  clearInterval(seizureInterval); seizureInterval = null;
+  renderSaude(); updateSeizureUI();
+}
+const fmtClock = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+function startSeizureTick() {
+  clearInterval(seizureInterval);
+  seizureInterval = setInterval(updateSeizureUI, 500);
+  updateSeizureUI();
+}
+let alarmed = false;
+function updateSeizureUI() {
+  const run = S.seizure.running;
+  const secs = run ? Math.max(0, Math.round((Date.now() - new Date(S.seizure.start)) / 1000)) : 0;
+  const alarm = run && secs >= 300;
+  if (alarm && !alarmed) { alarmed = true; try { navigator.vibrate?.([400, 200, 400, 200, 400]); } catch {} }
+  if (!run) alarmed = false;
+  $$('[data-seizure="box"]').forEach(box => {
+    box.classList.toggle('running', run && !alarm);
+    box.classList.toggle('alarm', alarm);
+    $('[data-seizure="clock"]', box).textContent = fmtClock(secs);
+    $('[data-seizure="since"]', box).textContent = run ? 'Início: ' + new Date(S.seizure.start).toLocaleTimeString('pt-BR') : 'Cronômetro de crise';
+    $('[data-seizure="msg"]', box).innerHTML = alarm
+      ? '<b>5 MINUTOS OU MAIS — LIGUE PARA O SAMU 192</b>'
+      : run ? 'Mantenha a criança de lado e protegida. Aos 5 min, acione o SAMU.' : 'Toque em iniciar quando a crise começar.';
+    $('[data-seizure="startBtn"]', box).disabled = run;
+    $('[data-seizure="stopBtn"]', box).disabled = !run;
+    let callLink = $('[data-seizure="call"]', box);
+    if (alarm && !callLink) {
+      box.insertAdjacentHTML('beforeend', `<a class="call-big" data-seizure="call" href="tel:192" style="margin-top:10px"><span class="ico">🚑</span><span><b>Ligar SAMU 192</b></span></a>`);
+    } else if (!alarm && callLink) callLink.remove();
+  });
+}
+
+/* ---------- Modo "Estou em uma emergência" ---------- */
+function openSOS() {
+  const M = S.medical;
+  const [h1, h2] = CONFIG.hospitals;
+  const big = (href, ico, title, sub, cls = '') => `<a class="call-big ${cls}" ${href ? `href="${esc(href)}"` : 'aria-disabled="true"'}>
+    <span class="ico">${ico}</span><span><b>${esc(title)}</b><small>${esc(sub)}</small></span></a>`;
+  $('#sosOverlay').innerHTML = `
+    <div class="sos-head"><h2 id="sosTitle">🚨 EMERGÊNCIA</h2><button class="sos-close" data-action="close-sos">✕ Fechar</button></div>
+    <div class="sos-body">
+      ${big('tel:192', '🚑', 'Ligar SAMU — 192', 'Emergência médica · ligação gratuita')}
+      <div class="sos-section">Crise convulsiva</div>
+      ${seizureTimerHtml()}
+      <div class="sos-section">Hospitais</div>
+      ${big(telHref(h1.phone), '🏥', h1.name, `${h1.role} · ${h1.phone}`, 'alt')}
+      <div class="btn-row" style="margin:-4px 0 10px">${mapBtn(h1.query, 'Mapa')}${navBtn(h1.query)}</div>
+      <p class="small"><span class="badge conf">A CONFIRMAR</span> capacidade pediátrica e estrutura neurológica.</p>
+      ${big(telHref(h2.phone), '🏥', h2.name, `${h2.role} · ${h2.phone}`, 'alt2')}
+      <div class="btn-row" style="margin:-4px 0 10px">${mapBtn(h2.query, 'Mapa')}${navBtn(h2.query)}</div>
+      <div class="sos-section">Contatos da criança</div>
+      ${big(M.respPhone ? telHref(M.respPhone) : null, '👤', 'Responsável' + (M.respName ? ': ' + M.respName : ''), M.respPhone || 'Telefone não preenchido na ficha médica', 'alt')}
+      ${big(M.neuroPhone ? telHref(M.neuroPhone) : null, '🩺', 'Neurologista' + (M.neuroName ? ': ' + M.neuroName : ''), M.neuroPhone || 'Telefone não preenchido na ficha médica', 'alt2')}
+      <div class="sos-section">Plano individual do neurologista</div>
+      ${isBlank(M.emergencyPlan)
+        ? '<div class="alert amber"><span class="ico">⚠️</span><span>Plano individual não preenchido. Preencha na Ficha médica (Saúde).</span></div>'
+        : `<div class="card danger"><div>${nl2br(M.emergencyPlan)}</div>${!isBlank(M.rescueMed) ? `<div class="note"><b>Resgate:</b> ${nl2br(M.rescueMed)}</div>` : ''}</div>`}
+      <div class="sos-section">Primeiros cuidados</div>
+      <div class="card">${protocolHtml()}</div>
+      ${neuroWarning()}
+      <div class="sos-section">Ficha da criança</div>
+      ${emergencyCardHtml()}
+      <button class="btn block" data-action="share-emergency">📤 Compartilhar informações de emergência</button>
+    </div>`;
+  $('#sosOverlay').hidden = false;
+  document.body.style.overflow = 'hidden';
+  $('#sosOverlay').scrollTop = 0;
+  updateSeizureUI();
+  $('.sos-close').focus();
+}
+function closeSOS() {
+  $('#sosOverlay').hidden = true;
+  $('#sosOverlay').innerHTML = '';
+  document.body.style.overflow = '';
+}
+
+/** Texto para compartilhamento das informações de emergência */
+function emergencyText() {
+  const M = S.medical, v = (k) => isBlank(M[k]) ? '(não preenchido)' : M[k];
+  const hs = CONFIG.hospitals.map(h => `• ${h.name} (${h.city}) – ${h.phone}\n  ${h.address}\n  ${S.hospitals[h.id]?.confirmed ? 'Atendimento confirmado pela família' : 'Pediatria/neurologia: A CONFIRMAR'}`).join('\n');
+  return `🆘 INFORMAÇÕES DE EMERGÊNCIA – Viagem Vale da Mantiqueira (16 a 19/11/2026)
+Hospedagem: Hotel Fazenda Vale da Mantiqueira – Virgínia/MG – (35) 3373-1900
+
+Criança: ${v('childName')}${M.childAge ? ', ' + M.childAge + ' anos' : ''}
+Condição: histórico de convulsões; uso contínuo de anticonvulsionante
+Medicamentos: ${v('meds')}
+Dose/horários: ${v('dosage')}
+Alergias: ${v('allergies')}
+Resgate: ${v('rescueMed')}
+Plano de emergência: ${v('emergencyPlan')}
+Responsável: ${v('respName')} – ${v('respPhone')}
+Neurologista: ${v('neuroName')} – ${v('neuroPhone')}
+Convênio: ${v('insurance')} – Carteirinha: ${v('insuranceCard')}
+
+SAMU: 192
+${hs}`;
+}
+
+/* =====================================================================
+   12. CONTATOS
+   ===================================================================== */
+function renderContatos() {
+  const initials = (n) => n.trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+  const person = (c, i, kind, famId = '') => `<div class="card">
+    <div class="person">
+      <div class="avatar" style="background:${['#8b6b4a', '#2f5d46', '#2c6787', '#7a5a3a'][i % 4]}">${isBlank(c.name) ? (i + 1) : esc(initials(c.name))}</div>
+      <div class="info">
+        ${isBlank(c.name) ? `<strong class="empty">${kind === 'trav' ? 'Viajante ' + (i + 1) + ' — preencher' : 'Contato sem nome'}</strong>` : `<strong>${esc(c.name)}</strong>`}
+        <div class="small muted">${esc(c.relation || 'Relação não informada')}</div>
+        <div>${c.phone ? esc(c.phone) : '<span class="small muted">Sem telefone</span>'}</div>
+        ${c.obs ? `<div class="note">${esc(c.obs)}</div>` : ''}
+      </div>
+    </div>
+    <div class="btn-row">
+      ${callBtn(c.phone)}${waBtn(c.phone)}
+      <button class="btn sm" data-action="edit-contact" data-kind="${kind}" data-fam="${famId}" data-id="${c.id}">✏️ Editar</button>
+      <button class="btn sm ghost" data-action="del-contact" data-kind="${kind}" data-fam="${famId}" data-id="${c.id}" aria-label="Excluir">🗑️</button>
+    </div></div>`;
+
+  $('#view-contatos').innerHTML = `
+    <div class="view-head"><div><h2>Contatos</h2><p class="muted small">Ligação e WhatsApp com um toque.</p></div>
+      <button class="btn sm primary" data-action="add-contact" data-kind="trav">＋ Viajante</button></div>
+    <h3>🧳 Viajantes (${S.contacts.length})</h3>
+    ${S.contacts.map((c, i) => person(c, i, 'trav')).join('') || '<p class="muted">Nenhum contato.</p>'}
+    <h3 style="margin-top:22px">🆘 Contatos de emergência das famílias</h3>
+    <p class="small muted">Pessoas que <b>não</b> estão viajando e devem ser avisadas em caso de emergência.</p>
+    ${S.families.map(f => `
+      <div class="card tint-earth">
+        <div class="card-title" style="justify-content:space-between"><h3>${esc(f.title)}</h3>
+          <button class="btn sm ghost" data-action="rename-fam" data-fam="${f.id}">✏️ Renomear</button></div>
+        ${f.contacts.map((c, i) => person(c, i, 'fam', f.id)).join('') || '<p class="small muted">Nenhum contato cadastrado.</p>'}
+        <button class="btn sm block" data-action="add-contact" data-kind="fam" data-fam="${f.id}">＋ Adicionar contato de emergência</button>
+      </div>`).join('')}`;
+}
+
+function contactList(kind, famId) { return kind === 'fam' ? S.families.find(f => f.id === famId)?.contacts : S.contacts; }
+
+function editContact(kind, famId, id) {
+  const list = contactList(kind, famId);
+  if (!list) return toast('Lista não encontrada.', 'error');
+  const c = id ? list.find(x => x.id === id) : null;
+  openForm({
+    title: c ? 'Editar contato' : 'Novo contato',
+    fields: [
+      { key: 'name', label: 'Nome', rules: 'required|text', value: c?.name || '' },
+      { key: 'phone', label: 'Telefone (com DDD)', rules: 'phone', type: 'tel', value: c?.phone || '', placeholder: '(21) 99999-9999' },
+      { key: 'relation', label: kind === 'fam' ? 'Relação com a família' : 'Parentesco / relação com o grupo', rules: 'text', value: c?.relation || '' },
+      { key: 'obs', label: 'Observações relevantes', type: 'textarea', rules: 'longtext', value: c?.obs || '' }
+    ],
+    onSave: v => {
+      if (c) Object.assign(c, v); else list.push({ id: uid(), ...v });
+      commit(c ? 'Contato atualizado' : 'Contato adicionado'); renderContatos();
+    }
+  });
+}
+
+/* =====================================================================
+   13. CHECKLISTS
+   ===================================================================== */
+function getChecklist(id) { return id === 'hotel' ? S.hotelChecklist : S.checklists.find(c => c.id === id); }
+
+function renderChecklistCard(container, list) {
+  const done = list.items.filter(i => i.done).length;
+  const pct = list.items.length ? Math.round(done / list.items.length * 100) : 0;
+  container.innerHTML = `
+    <div class="card-title" style="justify-content:space-between"><h3>${list.ico} ${esc(list.title)}</h3><span class="badge ${pct === 100 ? 'ok' : 'inf'}">${pct}%</span></div>
+    <div class="progress-label"><span>${done} de ${list.items.length} itens</span></div>
+    <div class="progress" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
+    <ul class="list-plain checks" style="margin-top:8px">${list.items.map(i => `
+      <li class="${i.done ? 'done' : ''}"><label><input type="checkbox" data-change="check" data-list="${list.id}" data-id="${i.id}" ${i.done ? 'checked' : ''}><span class="t">${esc(i.text)}</span></label>
+      <button class="icon-btn" data-action="del-check" data-list="${list.id}" data-id="${i.id}" aria-label="Remover item">✕</button></li>`).join('')}
+    </ul>
+    <form class="add-row" data-form="add-check" data-list="${list.id}">
+      <input name="text" maxlength="120" placeholder="Adicionar item personalizado" aria-label="Novo item">
+      <button class="btn sm primary" type="submit">＋</button>
+    </form>`;
+}
+
+function renderChecklistView() {
+  const all = S.checklists.flatMap(c => c.items);
+  const pct = all.length ? Math.round(all.filter(i => i.done).length / all.length * 100) : 0;
+  $('#view-checklist').innerHTML = `
+    <div class="view-head"><div><h2>Checklist da viagem</h2><p class="muted small">Marcações ficam salvas neste aparelho.</p></div>
+      <button class="btn sm ghost" data-action="go" data-view="mais">‹ Voltar</button></div>
+    <div class="card tint-green"><div class="progress-label"><b>Progresso geral</b><b>${pct}%</b></div>
+      <div class="progress"><span style="width:${pct}%"></span></div></div>
+    ${S.checklists.map(c => `<div class="card" data-checklist="${c.id}"></div>`).join('')}
+    <button class="btn block ghost" data-action="reset-checks">↺ Desmarcar todos os itens</button>`;
+  S.checklists.forEach(c => renderChecklistCard($(`[data-checklist="${c.id}"]`), c));
+}
+
+function rerenderChecklist(listId) {
+  if (listId === 'hotel') renderChecklistCard($('#hotelChecklistCard'), S.hotelChecklist);
+  else renderChecklistView();
+}
+
+/* =====================================================================
+   14. INFORMAÇÕES ÚTEIS (clima, endereços, telefones, custos)
+   ===================================================================== */
+const WMO = (c) => c === 0 ? ['☀️', 'Céu limpo'] : c <= 1 ? ['🌤️', 'Poucas nuvens'] : c === 2 ? ['⛅', 'Parcialmente nublado'] : c === 3 ? ['☁️', 'Nublado']
+  : c <= 48 ? ['🌫️', 'Neblina'] : c <= 57 ? ['🌦️', 'Garoa'] : c <= 67 ? ['🌧️', 'Chuva'] : c <= 77 ? ['❄️', 'Neve'] : c <= 82 ? ['🌦️', 'Pancadas de chuva']
+  : c <= 86 ? ['❄️', 'Neve'] : ['⛈️', 'Trovoadas'];
+
+function weatherHtml() {
+  const W = S.weather;
+  if (!W?.days?.length) return '<p class="small muted">Nenhuma previsão carregada. Toque em “Atualizar previsão” (requer internet).</p>';
+  return `<div class="weather">${W.days.map(d => {
+    const [ico, txt] = WMO(d.code);
+    const dt = new Date(d.date + 'T12:00:00-03:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+    return `<div class="wday"><b>${esc(dt)}</b><div class="wi">${ico}</div><div class="small">${txt}</div>
+      <div><b>${Math.round(d.max)}°</b> / ${Math.round(d.min)}°</div>${d.rain != null ? `<div class="small muted">💧 ${d.rain}% chuva</div>` : ''}</div>`;
+  }).join('')}</div><p class="small muted" style="margin-top:6px">Atualizado em ${esc(fmtDateTime(W.fetchedAt))} · fonte: Open-Meteo · ${esc(CONFIG.weather.label)}. Previsões mudam — atualize perto da data.</p>`;
+}
+
+async function fetchWeather() {
+  if (!navigator.onLine) return toast('Sem conexão. A previsão do tempo precisa de internet.', 'error');
+  const { lat, lon } = CONFIG.weather, d = CONFIG.trip.days;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FSao_Paulo&start_date=${d[0]}&end_date=${d[d.length - 1]}`;
+  const box = $('#weatherBox');
+  if (box) box.innerHTML = '<p class="small muted">Carregando previsão…</p>';
+  try {
+    const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 12000);
+    const res = await fetch(url, { signal: ctrl.signal }); clearTimeout(t);
+    const j = await res.json();
+    if (!res.ok || j.error) throw new Error(j.reason || 'HTTP ' + res.status);
+    const D = j.daily;
+    S.weather = { fetchedAt: new Date().toISOString(), days: D.time.map((date, i) => ({ date, code: D.weather_code[i], max: D.temperature_2m_max[i], min: D.temperature_2m_min[i], rain: D.precipitation_probability_max?.[i] ?? null })) };
+    commit('Previsão atualizada');
+  } catch (e) {
+    console.error(e);
+    toast(/range|date/i.test(String(e.message)) ? 'Previsão ainda indisponível para essas datas. Tente mais perto da viagem.' : 'Não foi possível obter a previsão agora.', 'error');
+  }
+  if (box) box.innerHTML = weatherHtml();
+}
+
+function renderInfo() {
+  const P = CONFIG.places;
+  const addrs = [P.hotel, P.graal, P.flona, P.passaQuatro, ...CONFIG.hospitals.map(h => ({ name: h.name, address: h.address, query: h.query }))];
+  const total = S.info.expenses.reduce((s, e) => s + parseMoney(e.value), 0) + parseMoney(S.info.fuel) + parseMoney(S.info.tolls);
+  $('#view-info').innerHTML = `
+    <div class="view-head"><div><h2>Informações úteis</h2></div>
+      <button class="btn sm ghost" data-action="go" data-view="mais">‹ Voltar</button></div>
+
+    <div class="card tint-blue">
+      <div class="card-title" style="justify-content:space-between"><h3>🌦️ Previsão do tempo</h3><span class="net-tag">🌐 internet</span></div>
+      <div id="weatherBox">${weatherHtml()}</div>
+      <div class="btn-row"><button class="btn blue sm" data-action="weather">↻ Atualizar previsão</button></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>☎️</span><h3>Telefones importantes</h3></div>
+      <ul class="list-plain">${[...CONFIG.usefulPhones,
+        { label: 'Hotel Fazenda Vale da Mantiqueira', phone: P.hotel.phones[0], ico: '🏨' },
+        { label: 'Hotel (2º número)', phone: P.hotel.phones[1], ico: '🏨' },
+        ...CONFIG.hospitals.map(h => ({ label: h.name, phone: h.phone, ico: '🏥' }))
+      ].map(t => `<li class="hosp-fact" style="align-items:center"><span>${t.ico} ${esc(t.label)}</span><a class="btn sm primary" href="${telHref(t.phone)}">📞 ${esc(t.phone)}</a></li>`).join('')}</ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>📍</span><h3>Endereços e navegação</h3></div>
+      ${addrs.map(a => `<div class="hosp-fact" style="flex-direction:column;align-items:stretch"><b>${esc(a.name)}</b><span class="small muted">${esc(a.address)}</span>
+        <div class="btn-row" style="margin-top:6px">${mapBtn(a.query, 'Mapa')}${navBtn(a.query)}</div></div>`).join('')}
+    </div>
+
+    <div class="card tint-earth">
+      <div class="card-title"><span>🛣️</span><h3>Pedágios</h3></div>
+      <p class="small">Se a rota passar pela Rodovia Presidente Dutra (onde fica o Graal Resende), haverá praças de pedágio. Os valores e a quantidade de praças dependem do trajeto escolhido e do tipo de veículo — consulte o app de navegação ou a concessionária antes de sair. Este guia não informa valores.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>💰</span><h3>Custos estimados</h3></div>
+      <div class="grid-2">
+        ${field({ bind: 'info.fuel', label: 'Combustível (R$)', rules: 'money', inputmode: 'decimal', placeholder: '0,00' })}
+        ${field({ bind: 'info.tolls', label: 'Pedágios (R$)', rules: 'money', inputmode: 'decimal', placeholder: '0,00' })}
+      </div>
+      <h3 style="font-size:.95rem">Despesas adicionais</h3>
+      <ul class="list-plain checks">${S.info.expenses.map(e => `<li><span class="t" style="flex:1">${esc(e.desc)}</span><b>${fmtMoney(parseMoney(e.value))}</b>
+        <button class="icon-btn" data-action="del-expense" data-id="${e.id}" aria-label="Excluir">🗑️</button></li>`).join('') || '<li class="small muted">Nenhuma despesa adicional.</li>'}</ul>
+      <button class="btn sm" data-action="add-expense">＋ Adicionar despesa</button>
+      <div class="total"><span>Total estimado</span><span id="costTotal">${fmtMoney(total)}</span></div>
+    </div>
+
+    <div class="card">
+      ${field({ bind: 'info.notes', label: '🗒️ Observações gerais', type: 'textarea', rules: 'longtext' })}
+    </div>`;
+}
+
+function updateCostTotal() {
+  const el = $('#costTotal');
+  if (el) el.textContent = fmtMoney(S.info.expenses.reduce((s, e) => s + parseMoney(e.value), 0) + parseMoney(S.info.fuel) + parseMoney(S.info.tolls));
+}
+
+/* =====================================================================
+   15. MAIS (menu, backup, impressão, compartilhamento)
+   ===================================================================== */
+function renderMais() {
+  const tile = (view, ico, t, s) => `<button class="q" data-action="go" data-view="${view}"><span class="ico">${ico}</span>${t}<small>${s}</small></button>`;
+  $('#view-mais').innerHTML = `
+    <div class="view-head"><div><h2>Mais</h2></div></div>
+    <div class="quick more-grid">
+      ${tile('hotel', '🏨', 'Hospedagem', 'Reserva e contatos')}
+      ${tile('passeios', '🌳', 'Passeios', 'Atrações e programação')}
+      ${tile('checklist', '✅', 'Checklist', 'Bagagem e documentos')}
+      ${tile('info', 'ℹ️', 'Informações', 'Clima, custos, endereços')}
+      ${tile('saude', '❤️‍🩹', 'Saúde', 'Ficha e hospitais')}
+      ${tile('roteiro', '🗺️', 'Roteiro', 'Ida e volta')}
+    </div>
+    <div class="card">
+      <div class="card-title"><span>🎨</span><h3>Aparência</h3></div>
+      <div class="seg" role="group" aria-label="Tema">
+        <button data-action="theme-set" data-theme="auto">🌓 Automático</button>
+        <button data-action="theme-set" data-theme="light">☀️ Claro</button>
+        <button data-action="theme-set" data-theme="dark">🌙 Escuro</button>
+      </div>
+      <p class="small muted" style="margin:8px 0 0">“Automático” segue o modo claro/escuro do celular. O tema escuro ajuda à noite na estrada e economiza bateria em telas OLED.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>📤</span><h3>Compartilhar</h3></div>
+      <div class="btn-row">
+        <button class="btn sm" data-action="share-trip">🧳 Resumo da viagem</button>
+        <button class="btn sm red" data-action="share-emergency">🆘 Informações de emergência</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>🖨️</span><h3>Imprimir / salvar em PDF</h3></div>
+      <p class="small muted">No celular, escolha “Salvar como PDF” na tela de impressão.</p>
+      <div class="btn-row">
+        <button class="btn sm" data-action="print-all">📘 Guia completo</button>
+        <button class="btn sm red" data-action="print-card">🆘 Cartão p/ porta-luvas</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>💾</span><h3>Backup dos dados</h3></div>
+      <p class="small muted">Roteiro, hotel, programação, hospitais, contatos e despesas são compartilhados com todos os viajantes. Ficha médica e checklists ficam só neste aparelho. Sem internet, tudo continua funcionando e as alterações sobem quando a conexão voltar.</p>
+      <p class="small">Sincronização: ${Sync.status()}</p>
+      <p class="small">Armazenamento local: ${Store.available ? '<span class="badge ok">ATIVO</span>' : '<span class="badge red">BLOQUEADO</span>'}
+        ${S.meta.updatedAt ? ` · última alteração ${esc(fmtDateTime(S.meta.updatedAt))}` : ''}</p>
+      <div class="btn-row">
+        <button class="btn sm primary" data-action="export">⬇️ Exportar backup (JSON)</button>
+        <button class="btn sm" data-action="import">⬆️ Importar backup</button>
+      </div>
+      <div class="btn-row"><button class="btn sm ghost" data-action="reset-all">⚠️ Apagar todos os dados</button></div>
+    </div>
+    <p class="small muted">Funções marcadas com <span class="net-tag">🌐 internet</span> precisam de conexão. Ligações, ficha médica, roteiro e checklists funcionam offline.</p>`;
+}
+
+function tripText() {
+  const r = S.route, line = (s) => `• ${s.time || '—'} – ${s.label}: ${s.title}${s.stay ? ` (${s.stay})` : ''}${s.notes ? ` – ${s.notes}` : ''}`;
+  return `🌄 Viagem em Família – Vale da Mantiqueira
+🏨 Hotel Fazenda Vale da Mantiqueira – Virgínia/MG
+📅 16/11/2026 a 19/11/2026 · ${CONFIG.trip.group}
+☎️ Hotel: (35) 3373-1900 / (35) 2143-0284
+${S.hotel.reserva ? '🧾 Reserva: ' + S.hotel.reserva + (S.hotel.responsavel ? ' (' + S.hotel.responsavel + ')' : '') + '\n' : ''}
+➡️ IDA (16/11)
+${r.ida.map(line).join('\n')}
+
+⬅️ VOLTA (19/11)
+${r.volta.map(line).join('\n')}
+
+Check-in 16h · Check-out até 12h
+🧭 Hotel no mapa: ${dirHref(CONFIG.places.hotel.query)}
+(Horários estimados)`;
+}
+
+async function shareText(title, text) {
+  try {
+    if (navigator.share) { await navigator.share({ title, text }); return toast('Compartilhado', 'ok'); }
+  } catch (e) { if (e.name === 'AbortError') return; console.warn(e); }
+  try { await navigator.clipboard.writeText(text); toast('Texto copiado. Cole no WhatsApp ou onde preferir.', 'ok'); }
+  catch {
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
+    toast('Abrindo o WhatsApp para compartilhar (requer internet).');
+  }
+}
+
+/* ---------- Exportar / importar ---------- */
+function exportBackup() {
+  try {
+    const payload = { app: CONFIG.appId, schemaVersion: CONFIG.schemaVersion, exportedAt: new Date().toISOString(), data: S };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'guia-viagem-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('Backup exportado', 'ok');
+  } catch (e) { console.error(e); toast('Não foi possível exportar o backup.', 'error'); }
+}
+function importBackup(file) {
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) return toast('Arquivo grande demais para ser um backup deste guia.', 'error');
+  const reader = new FileReader();
+  reader.onerror = () => toast('Erro ao ler o arquivo.', 'error');
+  reader.onload = () => {
+    try {
+      const j = JSON.parse(reader.result);
+      if (j.app !== CONFIG.appId || typeof j.data !== 'object' || !j.data) throw new Error('formato');
+      if (!confirm('Importar este backup substituirá os dados atuais deste aparelho. Continuar?')) return;
+      S = mergeDefaults(defaultState(), j.data);
+      if (!Array.isArray(S.contacts) || !Array.isArray(S.checklists) || !S.route?.ida) throw new Error('estrutura');
+      commit('Backup importado com sucesso', 'ok');
+      renderAll();
+    } catch (e) {
+      console.warn('Backup rejeitado:', e.message);
+      toast('Arquivo inválido: não é um backup deste guia.', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ---------- Impressão ---------- */
+function buildPrintCard() {
+  const M = S.medical, v = (k) => isBlank(M[k]) ? '______________________' : nl2br(M[k]);
+  $('#printCard').innerHTML = `<div class="pc-frame">
+    <div class="pc-title"><h1>🆘 CARTÃO DE EMERGÊNCIA</h1><div style="text-align:right"><b>Viagem Vale da Mantiqueira</b><br>16 a 19/11/2026</div></div>
+    <div class="pc-cols">
+      <div>
+        <div class="pc-box"><h2>Ligue</h2><p class="pc-big">SAMU 192</p><p>Bombeiros 193</p></div>
+        <div class="pc-box"><h2>Criança</h2>
+          <p><b>${v('childName')}</b>${M.childAge ? ' · ' + esc(M.childAge) + ' anos' : ''}</p>
+          <p>Histórico de convulsões · uso contínuo de anticonvulsionante</p>
+          <p><b>Medicamentos:</b> ${v('meds')}</p><p><b>Dose/horários:</b> ${v('dosage')}</p>
+          <p><b>Alergias:</b> ${v('allergies')}</p><p><b>Resgate:</b> ${v('rescueMed')}</p>
+          <p><b>Convênio:</b> ${v('insurance')} · <b>Nº:</b> ${v('insuranceCard')}</p></div>
+        <div class="pc-box"><h2>Contatos</h2>
+          <p><b>Responsável:</b> ${v('respName')} · ${v('respPhone')}</p>
+          <p><b>Neurologista:</b> ${v('neuroName')} · ${v('neuroPhone')}</p>
+          <p><b>Hotel:</b> (35) 3373-1900 · (35) 2143-0284</p></div>
+      </div>
+      <div>
+        ${CONFIG.hospitals.map(h => `<div class="pc-box"><h2>${esc(h.role)}</h2><p><b>${esc(h.name)}</b> – ${esc(h.city)}</p>
+          <p class="pc-big" style="font-size:12pt">${esc(h.phone)}</p><p>${esc(h.address)}</p>
+          <p class="pc-flag">${S.hospitals[h.id]?.confirmed ? '✔ Atendimento confirmado pela família' : '⚠ Pediatria/neurologia: A CONFIRMAR'}</p></div>`).join('')}
+        <div class="pc-box"><h2>Plano do neurologista</h2><p>${v('emergencyPlan')}</p></div>
+      </div>
+    </div>
+    <div class="pc-box"><h2>Em uma convulsão</h2><ol>${PROTOCOL.map(p => `<li>${esc(p)}</li>`).join('')}</ol>
+      <p><b>Seguir o plano individual de emergência fornecido pelo neurologista.</b></p></div>
+    <div class="pc-cut">✂ Recorte e guarde no porta-luvas · atualizado em ${new Date().toLocaleDateString('pt-BR')}</div>
+  </div>`;
+}
+function doPrint(mode) {
+  try {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.body.classList.toggle('print-card-mode', mode === 'card');
+    if (mode === 'card') buildPrintCard();
+    // Abre <details> para a ficha aparecer na impressão completa
+    $$('details.collapsible').forEach(d => (d.dataset.wasOpen = d.open, d.open = true));
+    setTimeout(() => window.print(), 50);
+  } catch (e) { console.error(e); toast('Impressão não disponível neste navegador.', 'error'); }
+}
+window.addEventListener('afterprint', () => {
+  document.body.classList.remove('print-card-mode');
+  $$('details.collapsible').forEach(d => { if (d.dataset.wasOpen === 'false') d.open = false; });
+});
+
+/* =====================================================================
+   16. FORMULÁRIOS: campos vinculados ao estado + diálogo de edição
+   ===================================================================== */
+/** Gera um campo ligado a um caminho do estado (salvamento automático) */
+function field({ bind, label, type = 'text', rules = 'text', placeholder = '', hint = '', inputmode = '' }) {
+  const id = 'f-' + bind.replace(/\./g, '-');
+  const val = getPath(S, bind) ?? '';
+  const attrs = `id="${id}" data-bind="${bind}" data-rules="${rules}" placeholder="${esc(placeholder)}"${inputmode ? ` inputmode="${inputmode}"` : ''}`;
+  return `<div class="field"><label for="${id}">${esc(label)}</label>
+    ${type === 'textarea' ? `<textarea ${attrs}>${esc(val)}</textarea>` : `<input type="${type}" ${attrs} value="${esc(val)}" autocomplete="off">`}
+    ${hint ? `<div class="hint">${esc(hint)}</div>` : ''}<div class="err" hidden></div></div>`;
+}
+
+function onBoundInput(el) {
+  const err = validate(el.value, el.dataset.rules);
+  const wrap = el.closest('.field');
+  if (wrap) {
+    wrap.classList.toggle('invalid', !!err);
+    const e = $('.err', wrap); if (e) { e.hidden = !err; e.textContent = err || ''; }
+  }
+  if (err) return; // não salva valor inválido
+  setPath(S, el.dataset.bind, el.value);
+  if (el.dataset.bind.startsWith('info.')) updateCostTotal();
+  commitDebounced();
+}
+
+/** Diálogo genérico de formulário com validação */
+let formCtx = null;
+function openForm({ title, fields, onSave }) {
+  const dlg = $('#formDialog');
+  formCtx = { fields, onSave };
+  dlg.innerHTML = `<form method="dialog" novalidate>
+    <h3>${esc(title)}</h3>
+    ${fields.map(f => `<div class="field"><label for="dlg-${f.key}">${esc(f.label)}${(f.rules || '').includes('required') ? ' *' : ''}</label>
+      ${f.type === 'textarea' ? `<textarea id="dlg-${f.key}" name="${f.key}" placeholder="${esc(f.placeholder || '')}">${esc(f.value)}</textarea>`
+        : `<input id="dlg-${f.key}" name="${f.key}" type="${f.type || 'text'}" value="${esc(f.value)}" placeholder="${esc(f.placeholder || '')}" autocomplete="off">`}
+      <div class="err" hidden></div></div>`).join('')}
+    <div class="dlg-actions"><button type="button" class="btn ghost" data-action="dlg-cancel">Cancelar</button><button type="submit" class="btn primary">Salvar</button></div>
+  </form>`;
+  if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+  // foca o primeiro campo apenas se o usuário ainda não estiver em outro
+  setTimeout(() => { if (!dlg.contains(document.activeElement) || document.activeElement.tagName === 'BUTTON') $('input,textarea', dlg)?.focus(); }, 30);
+}
+function closeForm() { const d = $('#formDialog'); if (d.open) d.close?.(); d.removeAttribute('open'); formCtx = null; }
+
+$('#formDialog').addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  if (!formCtx) return;
+  const form = ev.target, values = {};
+  let ok = true;
+  formCtx.fields.forEach(f => {
+    const el = form.elements[f.key];
+    const v = el.value.trim();
+    const err = validate(v, f.rules);
+    const wrap = el.closest('.field');
+    wrap.classList.toggle('invalid', !!err);
+    const e = $('.err', wrap); e.hidden = !err; e.textContent = err || '';
+    if (err) ok = false;
+    values[f.key] = v;
+  });
+  if (!ok) return toast('Verifique os campos destacados.', 'error');
+  try { const cb = formCtx.onSave; closeForm(); cb(values); }
+  catch (e) { console.error(e); toast('Erro ao salvar.', 'error'); }
+});
+
+/* =====================================================================
+   17. EVENTOS (delegação)
+   ===================================================================== */
+const ACTIONS = {
+  'go': el => go(el.dataset.view),
+  'sos': openSOS,
+  'close-sos': closeSOS,
+  'leg': el => { currentLeg = el.dataset.leg; renderRoute(); },
+  'edit-step': el => editStep(el.dataset.id),
+  'add-plan': el => editPlan(el.dataset.day),
+  'edit-plan': el => editPlan(el.dataset.day, el.dataset.id),
+  'del-plan': el => {
+    const day = S.plan.find(d => d.id === el.dataset.day);
+    if (!day || !confirm('Excluir esta atividade?')) return;
+    day.items = day.items.filter(i => i.id !== el.dataset.id); commit('Atividade excluída'); renderPasseios();
+  },
+  'add-contact': el => editContact(el.dataset.kind, el.dataset.fam),
+  'edit-contact': el => editContact(el.dataset.kind, el.dataset.fam, el.dataset.id),
+  'del-contact': el => {
+    const list = contactList(el.dataset.kind, el.dataset.fam);
+    const c = list?.find(x => x.id === el.dataset.id);
+    if (!c || !confirm(`Excluir o contato ${c.name || 'sem nome'}?`)) return;
+    list.splice(list.indexOf(c), 1); commit('Contato excluído'); renderContatos();
+  },
+  'rename-fam': el => {
+    const f = S.families.find(x => x.id === el.dataset.fam); if (!f) return;
+    openForm({ title: 'Renomear família', fields: [{ key: 'title', label: 'Nome do grupo', rules: 'required|text', value: f.title }],
+      onSave: v => { f.title = v.title; commit('Nome atualizado'); renderContatos(); } });
+  },
+  'del-check': el => {
+    const list = getChecklist(el.dataset.list); if (!list) return;
+    const it = list.items.find(i => i.id === el.dataset.id);
+    if (!it || !confirm(`Remover “${it.text}” da lista?`)) return;
+    list.items = list.items.filter(i => i !== it); commit('Item removido'); rerenderChecklist(list.id);
+  },
+  'reset-checks': () => {
+    if (!confirm('Desmarcar todos os itens do checklist geral?')) return;
+    S.checklists.forEach(c => c.items.forEach(i => (i.done = false))); commit('Checklist reiniciado'); renderChecklistView();
+  },
+  'add-expense': () => openForm({ title: 'Nova despesa', fields: [
+      { key: 'desc', label: 'Descrição', rules: 'required|text', placeholder: 'Ex.: lanche na estrada' },
+      { key: 'value', label: 'Valor (R$)', rules: 'required|money', placeholder: '0,00' }],
+    onSave: v => { S.info.expenses.push({ id: uid(), ...v }); commit('Despesa adicionada'); renderInfo(); } }),
+  'del-expense': el => { if (!confirm('Excluir esta despesa?')) return; S.info.expenses = S.info.expenses.filter(e => e.id !== el.dataset.id); commit('Despesa excluída'); renderInfo(); },
+  'weather': fetchWeather,
+  'seizure-start': seizureStart,
+  'seizure-stop': seizureStop,
+  'clear-seizure-log': () => { if (!confirm('Apagar o registro de crises?')) return; S.seizureLog = []; commit('Registro apagado'); renderSaude(); },
+  'share-emergency': () => shareText('Informações de emergência', emergencyText()),
+  'share-trip': () => shareText('Viagem Vale da Mantiqueira', tripText()),
+  'print-all': () => doPrint('all'),
+  'print-card': () => doPrint('card'),
+  'export': exportBackup,
+  'import': () => $('#importFile').click(),
+  'reset-all': () => {
+    if (!confirm('Apagar os dados DESTE APARELHO (ficha médica, checklists)? Os dados compartilhados do grupo não são apagados. Recomenda-se exportar um backup antes.')) return;
+    if (!confirm('Tem certeza? Esta ação não pode ser desfeita.')) return;
+    // Não propaga o apagamento ao grupo: os dados compartilhados voltam na próxima sincronização
+    S = defaultState(); Sync.rebase(true); commit('Dados apagados'); renderAll(); Sync.run();
+  },
+  'dlg-cancel': closeForm,
+  'theme-cycle': () => Theme.cycle(),
+  'theme-set': el => Theme.set(el.dataset.theme)
+};
+
+document.addEventListener('click', (ev) => {
+  const el = ev.target.closest('[data-action]');
+  if (el) {
+    const fn = ACTIONS[el.dataset.action];
+    if (fn) { ev.preventDefault(); try { fn(el); } catch (e) { console.error(e); toast('Algo deu errado. Tente novamente.', 'error'); } }
+    return;
+  }
+  // Aviso de conexão para links externos
+  const net = ev.target.closest('a.needs-net');
+  if (net && !navigator.onLine) toast('Sem conexão: esta função pode não funcionar sem internet.', 'error');
+});
+
+document.addEventListener('change', (ev) => {
+  const el = ev.target;
+  try {
+    if (el.dataset.change === 'check') {
+      const list = getChecklist(el.dataset.list); const it = list?.items.find(i => i.id === el.dataset.id);
+      if (!it) return;
+      it.done = el.checked; commit(); rerenderChecklist(list.id);
+      if (list.items.length && list.items.every(i => i.done)) toast(`${list.title}: tudo pronto! ✅`, 'ok');
+    } else if (el.dataset.change === 'plan') {
+      const it = S.plan.find(d => d.id === el.dataset.day)?.items.find(i => i.id === el.dataset.id);
+      if (!it) return;
+      it.done = el.checked; commit(el.checked ? 'Marcado como realizado' : ''); renderPasseios();
+    } else if (el.dataset.change === 'hosp-confirm') {
+      S.hospitals[el.dataset.id].confirmed = el.checked; commit(el.checked ? 'Hospital marcado como confirmado' : 'Confirmação removida');
+      renderSaude();
+    } else if (el.id === 'importFile') {
+      importBackup(el.files[0]); el.value = '';
+    }
+  } catch (e) { console.error(e); toast('Não foi possível salvar a alteração.', 'error'); }
+});
+
+document.addEventListener('input', (ev) => { if (ev.target.matches('[data-bind]')) onBoundInput(ev.target); });
+document.addEventListener('submit', (ev) => {
+  const f = ev.target.closest('[data-form="add-check"]');
+  if (!f) return;
+  ev.preventDefault();
+  const text = f.elements.text.value.trim();
+  if (!text) return toast('Digite o nome do item.', 'error');
+  if (text.length > 120) return toast('Máximo de 120 caracteres.', 'error');
+  const list = getChecklist(f.dataset.list);
+  list.items.push({ id: uid(), text, done: false });
+  commit('Item adicionado'); rerenderChecklist(list.id);
+});
+document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && !$('#sosOverlay').hidden) closeSOS(); });
+window.addEventListener('online', updateNet);
+window.addEventListener('offline', updateNet);
+
+/* =====================================================================
+   18. INICIALIZAÇÃO
+   ===================================================================== */
+/** Atualiza partes derivadas após salvar (sem tirar o foco dos campos) */
+function renderDerived() {
+  renderPendencies();
+  const slot = $('#emCardSlot'); if (slot) slot.innerHTML = emergencyCardHtml();
+}
+function renderAll() {
+  renderHome(); renderRoute(); renderSaude(); renderContatos(); renderMais();
+  renderHotel(); renderPasseios(); renderChecklistView(); renderInfo();
+  Theme.apply();
+}
+
+(function init() {
+  try {
+    renderAll();
+    updateNet();
+    if (!Store.available) $('#storageWarning').hidden = false;
+    if (S.seizure.running) startSeizureTick();
+    setInterval(updateCountdown, 30000);
+    go(location.hash.slice(1) || 'inicio', { push: false });
+    Sync.init();
+    // Service worker: guarda o guia no aparelho para abrir sem internet
+    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW:', e));
+  } catch (e) {
+    console.error(e);
+    document.body.insertAdjacentHTML('afterbegin', '<div class="banner warn">Erro ao carregar o guia. Tente recarregar a página.</div>');
+  }
+})();
+</script>
+</body>
+</html>
